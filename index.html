@@ -13,7 +13,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .header h1{font-size:1.3em;margin-bottom:2px}
 .header p{font-size:.78em;opacity:.85}
 .progress-bar{width:100%;height:4px;background:rgba(255,255,255,.2);margin-top:10px;border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;background:#34d399;width:10%;transition:width .4s ease;border-radius:2px}
+.progress-fill{height:100%;background:#34d399;width:0%;transition:width .4s ease;border-radius:2px}
 .nav-dots{display:flex;justify-content:center;gap:6px;padding:12px 16px;background:#fff;border-bottom:1px solid #e5e7eb;flex-wrap:wrap}
 .nav-dot{width:28px;height:28px;border-radius:50%;border:2px solid #cbd5e1;background:#fff;font-size:.7em;font-weight:600;color:#94a3b8;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s ease}
 .nav-dot.active{border-color:#2563eb;background:#2563eb;color:#fff}
@@ -24,6 +24,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .section-title{font-size:1.2em;color:#1a365d;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #2563eb}
 .card{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid #e5e7eb}
 .card.triage-card{border-left:4px solid #2563eb;background:#f0f7ff}
+.card.error{border-color:#dc2626;box-shadow:0 0 0 3px rgba(220,38,38,.15)}
 .q{display:block;font-weight:600;font-size:.92em;margin-bottom:10px;color:#1e293b;line-height:1.4}
 .q.required::after{content:' *';color:#dc2626}
 .radio-group{display:flex;gap:8px;flex-wrap:wrap}
@@ -33,6 +34,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .radio-group input[type="radio"]:checked+span{border-color:#2563eb;background:#eff6ff;color:#1d4ed8;font-weight:600}
 input[type="text"],input[type="date"],textarea,select{width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:.95em;font-family:inherit;transition:border-color .2s;-webkit-appearance:none}
 input[type="text"]:focus,input[type="date"]:focus,textarea:focus,select:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+input.error,select.error,textarea.error{border-color:#dc2626;box-shadow:0 0 0 3px rgba(220,38,38,.15)}
 textarea{min-height:80px;resize:vertical}
 select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 12px center;padding-right:32px}
 .matrix-table{width:100%;border-collapse:collapse;font-size:.85em;margin-top:6px}
@@ -68,6 +70,8 @@ select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
 .modal h2{margin-bottom:8px;color:#059669}
 .modal p{font-size:.9em;color:#64748b;margin-bottom:20px}
 .modal button{padding:12px 32px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:1em;font-weight:600;cursor:pointer}
+.error-banner{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;padding:12px 16px;border-radius:8px;margin-bottom:12px;font-size:.9em;display:none}
+.error-banner.show{display:block}
 </style>
 </head>
 <body>
@@ -77,157 +81,12 @@ select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 </div>
 <div class="nav-dots" id="navDots"></div>
-
-<!-- SECTION 0: General Info -->
-<div class="section active" id="section-0">
-<h2 class="section-title">General Information</h2>
-<div class="card"><label class="q required">Date of QUEST</label><input type="date" id="quest_date"></div>
-<div class="card"><label class="q required">Inspector Name</label><input type="text" id="inspector_name" placeholder="Enter your name"></div>
-<div class="card"><label class="q required">Room / Lab Number</label><input type="text" id="room_number" placeholder="e.g. 71-207"></div>
-</div>
-
-<!-- SECTION 1: General Lab Safety -->
-<div class="section" id="section-1">
-<h2 class="section-title">General Lab Safety</h2>
-<div class="card"><label class="q required">Are there any immediate hazards?</label><div class="radio-group"><label><input type="radio" name="immediate_hazards" value="Yes"><span>Yes</span></label><label><input type="radio" name="immediate_hazards" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">If yes, describe hazard and corrective action</label><textarea id="immediate_hazards_desc" placeholder="Describe hazard..."></textarea></div>
-<div class="card"><label class="q">Is there a trip and/or fall hazard?</label><div class="radio-group"><label><input type="radio" name="trip_fall" value="Yes"><span>Yes</span></label><label><input type="radio" name="trip_fall" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">If yes, describe hazard</label><textarea id="trip_fall_desc" placeholder="Describe trip/fall hazard..."></textarea></div>
-<div class="card"><label class="q">Are loud noise source controls in place?</label><div class="radio-group"><label><input type="radio" name="loud_noise" value="N/A"><span>N/A</span></label><label><input type="radio" name="loud_noise" value="Yes"><span>Yes</span></label><label><input type="radio" name="loud_noise" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Are sharp tools and broken glass disposed of properly?</label><div class="radio-group"><label><input type="radio" name="sharp_tools" value="N/A"><span>N/A</span></label><label><input type="radio" name="sharp_tools" value="Yes"><span>Yes</span></label><label><input type="radio" name="sharp_tools" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Are there any outdated/incorrect/missing signs?</label><div class="radio-group"><label><input type="radio" name="outdated_signs" value="Yes"><span>Yes</span></label><label><input type="radio" name="outdated_signs" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Any water leaks or equipment exhibiting corrosion?</label><div class="radio-group"><label><input type="radio" name="water_leak_equip" value="Yes"><span>Yes</span></label><label><input type="radio" name="water_leak_equip" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Are gas cylinders properly restrained and capped?</label><div class="radio-group"><label><input type="radio" name="gas_cylinders" value="N/A"><span>N/A</span></label><label><input type="radio" name="gas_cylinders" value="Yes"><span>Yes</span></label><label><input type="radio" name="gas_cylinders" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Machine Guarding</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Are machine guards present?</td><td><input type="radio" name="mg_guards" value="N/A"></td><td><input type="radio" name="mg_guards" value="Yes"></td><td><input type="radio" name="mg_guards" value="No"></td></tr><tr><td>Do guards allow work without impedance?</td><td><input type="radio" name="mg_work" value="N/A"></td><td><input type="radio" name="mg_work" value="Yes"></td><td><input type="radio" name="mg_work" value="No"></td></tr><tr><td>Is bypass of guard or interlock required?</td><td><input type="radio" name="mg_bypass" value="N/A"></td><td><input type="radio" name="mg_bypass" value="Yes"></td><td><input type="radio" name="mg_bypass" value="No"></td></tr></table></div></div>
-<div class="card"><label class="q">Cryogenic Liquid Systems</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Good condition (plumbing/valving)?</td><td><input type="radio" name="cryo_cond" value="N/A"></td><td><input type="radio" name="cryo_cond" value="Yes"></td><td><input type="radio" name="cryo_cond" value="No"></td></tr><tr><td>Safety nozzles present?</td><td><input type="radio" name="cryo_nozzle" value="N/A"></td><td><input type="radio" name="cryo_nozzle" value="Yes"></td><td><input type="radio" name="cryo_nozzle" value="No"></td></tr><tr><td>Any visible leaks?</td><td><input type="radio" name="cryo_leaks" value="N/A"></td><td><input type="radio" name="cryo_leaks" value="Yes"></td><td><input type="radio" name="cryo_leaks" value="No"></td></tr><tr><td>PPE available?</td><td><input type="radio" name="cryo_ppe" value="N/A"></td><td><input type="radio" name="cryo_ppe" value="Yes"></td><td><input type="radio" name="cryo_ppe" value="No"></td></tr><tr><td>Signage in place?</td><td><input type="radio" name="cryo_sign" value="N/A"></td><td><input type="radio" name="cryo_sign" value="Yes"></td><td><input type="radio" name="cryo_sign" value="No"></td></tr></table></div></div>
-<div class="card"><label class="q">Ventilation Systems</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Area uncluttered, sash down when not in use?</td><td><input type="radio" name="vent_unclut" value="N/A"></td><td><input type="radio" name="vent_unclut" value="Yes"></td><td><input type="radio" name="vent_unclut" value="No"></td></tr><tr><td>Current inspection sticker present?</td><td><input type="radio" name="vent_sticker" value="N/A"></td><td><input type="radio" name="vent_sticker" value="Yes"></td><td><input type="radio" name="vent_sticker" value="No"></td></tr></table></div></div>
-<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="gen_safety_comments" placeholder="Enter comments..."></textarea></div>
-<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_gen').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_gen" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_gen')"><div class="photo-preview-container" id="preview_gen"></div></div>
-</div>
-
-<!-- SECTION 2: Ergonomics -->
-<div class="section" id="section-2">
-<h2 class="section-title">Lab Ergonomics</h2>
-<div class="card"><label class="q">Are any ergonomic supports needed?</label><div class="radio-group"><label><input type="radio" name="ergo_support" value="Yes"><span>Yes</span></label><label><input type="radio" name="ergo_support" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">If yes, describe</label><textarea id="ergo_support_desc" placeholder="Describe ergonomic support needed..."></textarea></div>
-<div class="card"><label class="q">Does the workstation support a good posture?</label><div class="radio-group"><label><input type="radio" name="ergo_posture" value="Yes"><span>Yes</span></label><label><input type="radio" name="ergo_posture" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Are work surfaces, tables, and chairs adjustable?</label><div class="radio-group"><label><input type="radio" name="ergo_adjust" value="N/A"><span>N/A</span></label><label><input type="radio" name="ergo_adjust" value="Yes"><span>Yes</span></label><label><input type="radio" name="ergo_adjust" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Is there insufficient lighting?</label><div class="radio-group"><label><input type="radio" name="ergo_lighting" value="Yes"><span>Yes</span></label><label><input type="radio" name="ergo_lighting" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="ergo_comments" placeholder="Enter comments..."></textarea></div>
-<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_ergo').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_ergo" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_ergo')"><div class="photo-preview-container" id="preview_ergo"></div></div>
-</div>
-
-<!-- SECTION 3: Emergency Preparedness -->
-<div class="section" id="section-3">
-<h2 class="section-title">Emergency Preparedness</h2>
-<div class="card"><label class="q">Are emergency exits clear and unobstructed? Exit signs illuminated?</label><div class="radio-group"><label><input type="radio" name="emergency_exit" value="Yes"><span>Yes</span></label><label><input type="radio" name="emergency_exit" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Items that could fall, tip, or break during earthquake?</label><div class="radio-group"><label><input type="radio" name="earthquake_risk" value="Yes"><span>Yes</span></label><label><input type="radio" name="earthquake_risk" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Are fire extinguishers accessible and charged?</label><div class="radio-group"><label><input type="radio" name="fire_ext" value="N/A"><span>N/A</span></label><label><input type="radio" name="fire_ext" value="Yes"><span>Yes</span></label><label><input type="radio" name="fire_ext" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="emergency_comments" placeholder="Enter comments..."></textarea></div>
-<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_emergency').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_emergency" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_emergency')"><div class="photo-preview-container" id="preview_emergency"></div></div>
-</div>
-
-<!-- SECTION 4: Electrical Safety -->
-<div class="section" id="section-4">
-<h2 class="section-title">Electrical Safety</h2>
-<div class="card"><label class="q">Electrical Panels</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Access unobstructed (36" clearance)?</td><td><input type="radio" name="elec_panels" value="N/A"></td><td><input type="radio" name="elec_panels" value="Yes"></td><td><input type="radio" name="elec_panels" value="No"></td></tr><tr><td>Breakers identified, panel good condition?</td><td><input type="radio" name="elec_breakers" value="N/A"></td><td><input type="radio" name="elec_breakers" value="Yes"></td><td><input type="radio" name="elec_breakers" value="No"></td></tr></table></div></div>
-<div class="card"><label class="q">Outlets and Receptacles</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Outlets/receptacles in good condition?</td><td><input type="radio" name="elec_outlets" value="N/A"></td><td><input type="radio" name="elec_outlets" value="Yes"></td><td><input type="radio" name="elec_outlets" value="No"></td></tr><tr><td>GFCI present/verified where required?</td><td><input type="radio" name="elec_gfci" value="N/A"></td><td><input type="radio" name="elec_gfci" value="Yes"></td><td><input type="radio" name="elec_gfci" value="No"></td></tr></table></div></div>
-<div class="card"><label class="q">Are heat tapes properly connected?</label><div class="radio-group"><label><input type="radio" name="elec_heat" value="N/A"><span>N/A</span></label><label><input type="radio" name="elec_heat" value="Yes"><span>Yes</span></label><label><input type="radio" name="elec_heat" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Extension Cords</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Used as temporary wiring only?</td><td><input type="radio" name="ext_temp" value="N/A"></td><td><input type="radio" name="ext_temp" value="Yes"></td><td><input type="radio" name="ext_temp" value="No"></td></tr><tr><td>Good condition, grounded (3-prong)?</td><td><input type="radio" name="ext_cond" value="N/A"></td><td><input type="radio" name="ext_cond" value="Yes"></td><td><input type="radio" name="ext_cond" value="No"></td></tr><tr><td>Power strips have circuit breaker?</td><td><input type="radio" name="ext_breaker" value="N/A"></td><td><input type="radio" name="ext_breaker" value="Yes"></td><td><input type="radio" name="ext_breaker" value="No"></td></tr><tr><td>No daisy-chaining?</td><td><input type="radio" name="ext_daisy" value="N/A"></td><td><input type="radio" name="ext_daisy" value="Yes"></td><td><input type="radio" name="ext_daisy" value="No"></td></tr></table></div></div>
-<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="elec_comments" placeholder="Enter comments..."></textarea></div>
-<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_elec').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_elec" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_elec')"><div class="photo-preview-container" id="preview_elec"></div></div>
-</div><!-- SECTION 5: Soldering -->
-<div class="section" id="section-5">
-<h2 class="section-title">Soldering</h2>
-<div class="card triage-card"><label class="q required">Is there soldering performed within your area?</label><div class="radio-group"><label><input type="radio" name="triage_solder" value="Yes" onchange="toggleExpand('solder_details',true)"><span>Yes</span></label><label><input type="radio" name="triage_solder" value="N/A" onchange="toggleExpand('solder_details',false)"><span>N/A</span></label></div></div>
-<div class="expandable" id="solder_details">
-<div class="card"><label class="q">Are soldering activities described by a WPC for this area?</label><div class="radio-group"><label><input type="radio" name="solder_wpc" value="Yes"><span>Yes</span></label><label><input type="radio" name="solder_wpc" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Identify means of ventilation for soldering</label><div class="radio-group" style="flex-direction:column;"><label><input type="radio" name="solder_vent" value="Open Air - No Mechanical Ventilation"><span>Open Air - No Mechanical Ventilation</span></label><label><input type="radio" name="solder_vent" value="Mechanical Ventilation - Fan"><span>Mechanical Ventilation - Fan</span></label><label><input type="radio" name="solder_vent" value="Mechanical Ventilation - Fume Extractor"><span>Mechanical Ventilation - Fume Extractor</span></label><label><input type="radio" name="solder_vent" value="N/A"><span>N/A - No soldering station</span></label></div></div>
-<div class="card"><label class="q">Is there a hot work permit for soldering?</label><div class="radio-group" style="flex-direction:column;"><label><input type="radio" name="solder_permit" value="Yes"><span>Yes</span></label><label><input type="radio" name="solder_permit" value="No"><span>No - Soldering occurs but no permit</span></label><label><input type="radio" name="solder_permit" value="N/A"><span>N/A - No soldering station</span></label></div></div>
-</div>
-<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="solder_comments" placeholder="Enter comments..."></textarea></div>
-<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_solder').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_solder" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_solder')"><div class="photo-preview-container" id="preview_solder"></div></div>
-</div>
-
-<!-- SECTION 6: Chemical Safety -->
-<div class="section" id="section-6">
-<h2 class="section-title">Chemical Safety</h2>
-<div class="card triage-card"><label class="q required">Are chemicals present in the area?</label><div class="radio-group"><label><input type="radio" name="triage_chem" value="Yes" onchange="toggleExpand('chem_details',true)"><span>Yes</span></label><label><input type="radio" name="triage_chem" value="N/A" onchange="toggleExpand('chem_details',false)"><span>N/A</span></label></div></div>
-<div class="expandable" id="chem_details">
-<div class="card"><label class="q">Are all chemical containers properly labeled?</label><div class="radio-group"><label><input type="radio" name="chem_label" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_label" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Are SDS sheets accessible?</label><div class="radio-group"><label><input type="radio" name="chem_sds" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_sds" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Are chemicals stored properly (compatibility, containment)?</label><div class="radio-group"><label><input type="radio" name="chem_storage" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_storage" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Is a chemical inventory maintained?</label><div class="radio-group"><label><input type="radio" name="chem_inventory" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_inventory" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Are there expired chemicals that need disposal?</label><div class="radio-group"><label><input type="radio" name="chem_expired" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_expired" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Is appropriate PPE available for chemical handling?</label><div class="radio-group"><label><input type="radio" name="chem_ppe" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_ppe" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Are spill kits available and stocked?</label><div class="radio-group"><label><input type="radio" name="chem_spill" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_spill" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Is chemical waste properly labeled and stored?</label><div class="radio-group"><label><input type="radio" name="chem_waste" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_waste" value="No"><span>No</span></label></div></div>
-</div>
-<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="chem_comments" placeholder="Enter comments..."></textarea></div>
-<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_chem').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_chem" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_chem')"><div class="photo-preview-container" id="preview_chem"></div></div>
-</div>
-
-<!-- SECTION 7: Laser Safety -->
-<div class="section" id="section-7">
-<h2 class="section-title">Laser Safety</h2>
-<div class="card triage-card"><label class="q required">Are lasers present in the area?</label><div class="radio-group"><label><input type="radio" name="triage_laser" value="Yes" onchange="toggleExpand('laser_details',true)"><span>Yes</span></label><label><input type="radio" name="triage_laser" value="N/A" onchange="toggleExpand('laser_details',false)"><span>N/A</span></label></div></div>
-<div class="expandable" id="laser_details">
-<div class="card"><label class="q">Laser Safety</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Are laser warning signs posted?</td><td><input type="radio" name="laser_signs" value="N/A"></td><td><input type="radio" name="laser_signs" value="Yes"></td><td><input type="radio" name="laser_signs" value="No"></td></tr><tr><td>Are laser safety goggles available?</td><td><input type="radio" name="laser_goggles" value="N/A"></td><td><input type="radio" name="laser_goggles" value="Yes"></td><td><input type="radio" name="laser_goggles" value="No"></td></tr><tr><td>Are beam paths enclosed where possible?</td><td><input type="radio" name="laser_beam" value="N/A"></td><td><input type="radio" name="laser_beam" value="Yes"></td><td><input type="radio" name="laser_beam" value="No"></td></tr><tr><td>Is a laser SOP available?</td><td><input type="radio" name="laser_sop" value="N/A"></td><td><input type="radio" name="laser_sop" value="Yes"></td><td><input type="radio" name="laser_sop" value="No"></td></tr><tr><td>Are interlocks functional?</td><td><input type="radio" name="laser_interlock" value="N/A"></td><td><input type="radio" name="laser_interlock" value="Yes"></td><td><input type="radio" name="laser_interlock" value="No"></td></tr></table></div></div>
-</div>
-<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="laser_comments" placeholder="Enter comments..."></textarea></div>
-<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_laser').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_laser" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_laser')"><div class="photo-preview-container" id="preview_laser"></div></div>
-</div>
-
-<!-- SECTION 8: Radiation Safety -->
-<div class="section" id="section-8">
-<h2 class="section-title">Radiation Safety</h2>
-<div class="card triage-card"><label class="q required">Are radiation sources present?</label><div class="radio-group"><label><input type="radio" name="triage_rad" value="Yes" onchange="toggleExpand('rad_details',true)"><span>Yes</span></label><label><input type="radio" name="triage_rad" value="N/A" onchange="toggleExpand('rad_details',false)"><span>N/A</span></label></div></div>
-<div class="expandable" id="rad_details">
-<div class="card"><label class="q">Radiation Safety</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Are radiation warning signs posted?</td><td><input type="radio" name="rad_signs" value="N/A"></td><td><input type="radio" name="rad_signs" value="Yes"></td><td><input type="radio" name="rad_signs" value="No"></td></tr><tr><td>Are dosimeters available/worn?</td><td><input type="radio" name="rad_dosimeter" value="N/A"></td><td><input type="radio" name="rad_dosimeter" value="Yes"></td><td><input type="radio" name="rad_dosimeter" value="No"></td></tr><tr><td>Is shielding adequate?</td><td><input type="radio" name="rad_shield" value="N/A"></td><td><input type="radio" name="rad_shield" value="Yes"></td><td><input type="radio" name="rad_shield" value="No"></td></tr><tr><td>Are survey instruments available and calibrated?</td><td><input type="radio" name="rad_survey" value="N/A"></td><td><input type="radio" name="rad_survey" value="Yes"></td><td><input type="radio" name="rad_survey" value="No"></td></tr></table></div></div>
-</div>
-<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="rad_comments" placeholder="Enter comments..."></textarea></div>
-<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_rad').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_rad" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_rad')"><div class="photo-preview-container" id="preview_rad"></div></div>
-</div>
-
-<!-- SECTION 9: PPE -->
-<div class="section" id="section-9">
-<h2 class="section-title">Personal Protective Equipment</h2>
-<div class="card"><label class="q">Are workers wearing appropriate PPE?</label><div class="radio-group"><label><input type="radio" name="ppe_wearing" value="Yes"><span>Yes</span></label><label><input type="radio" name="ppe_wearing" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Is PPE in good condition?</label><div class="radio-group"><label><input type="radio" name="ppe_condition" value="Yes"><span>Yes</span></label><label><input type="radio" name="ppe_condition" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Is PPE readily available for visitors/guests?</label><div class="radio-group"><label><input type="radio" name="ppe_visitors" value="Yes"><span>Yes</span></label><label><input type="radio" name="ppe_visitors" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Are safety glasses/goggles available?</label><div class="radio-group"><label><input type="radio" name="ppe_glasses" value="N/A"><span>N/A</span></label><label><input type="radio" name="ppe_glasses" value="Yes"><span>Yes</span></label><label><input type="radio" name="ppe_glasses" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Are hearing protectors available?</label><div class="radio-group"><label><input type="radio" name="ppe_hearing" value="N/A"><span>N/A</span></label><label><input type="radio" name="ppe_hearing" value="Yes"><span>Yes</span></label><label><input type="radio" name="ppe_hearing" value="No"><span>No</span></label></div></div>
-<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="ppe_comments" placeholder="Enter comments..."></textarea></div>
-<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_ppe').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_ppe" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_ppe')"><div class="photo-preview-container" id="preview_ppe"></div></div>
-</div>
-
-<!-- SECTION 10: Review & Submit -->
-<div class="section" id="section-10">
-<h2 class="section-title">Review &amp; Submit</h2>
-<div class="card">
-<label class="q">Overall Assessment</label>
-<div class="radio-group" style="flex-direction:column;">
-<label><input type="radio" name="overall" value="Satisfactory - No issues found"><span>✅ Satisfactory - No issues found</span></label>
-<label><input type="radio" name="overall" value="Minor Issues - Corrections needed"><span>⚠️ Minor Issues - Corrections needed</span></label>
-<label><input type="radio" name="overall" value="Major Issues - Immediate action required"><span>🚨 Major Issues - Immediate action required</span></label>
-</div>
-</div>
-<div class="card"><label class="q">Additional Notes</label><textarea id="final_notes" placeholder="Any additional observations or recommendations..." style="min-height:120px;"></textarea></div>
-<div class="card" style="background:#f0fdf4;border-color:#86efac;">
-<p style="font-size:.9em;color:#166534;"><strong>Ready to submit?</strong> Please review all sections before submitting. Once submitted, data will be sent to the QUEST Google Sheet.</p>
-</div>
-</div>
-
-<!-- BUTTON ROW -->
+<div id="appContainer"></div>
 <div class="btn-row">
 <button class="btn btn-prev" id="btnPrev" onclick="navigate(-1)">← Back</button>
 <button class="btn btn-next" id="btnNext" onclick="navigate(1)">Next →</button>
 </div>
-
-<!-- LOADING OVERLAY -->
 <div id="loadingOverlay"><div class="spinner"></div></div>
-
-<!-- SUCCESS MODAL -->
 <div id="modalOverlay">
 <div class="modal">
 <div class="checkmark">✅</div>
@@ -235,246 +94,653 @@ select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
 <p>Your QUEST inspection has been recorded successfully.</p>
 <button onclick="location.reload()">New Inspection</button>
 </div>
-</div><script>
-const TOTAL=11;
-const SHEET_URL="https://script.google.com/a/macros/lbl.gov/s/AKfycbxEvZvHXKyGpLSC4vq1cYnDpXLF_2ImxhMu_a5SdE4oQx3Qw_iw-p0wQv0-DUPHIbnP9A/exec";
-const DRIVE_FOLDER="11OZE6xSbCw4UpyRIg6bCNXRE9r79tCPG";
-let cur=0;
-let visited=new Set([0]);
-let photoStore={};
+</div>
+  <script>
+// ============================================================
+// CONFIGURATION - EDIT THIS SECTION TO ADD/REMOVE/MODIFY
+// ============================================================
 
-function init(){
-let nd=document.getElementById('navDots');
-for(let i=0;i<TOTAL;i++){
-let d=document.createElement('div');
-d.className='nav-dot'+(i===0?' active':'');
-d.textContent=i+1;
-d.onclick=()=>goTo(i);
-nd.appendChild(d);
+const SHEET_URL = "https://script.google.com/a/macros/lbl.gov/s/AKfycbwMcghHzgWCP8pZACtxotqQbc4fJdfnT1LEtrNq4ZZzwtbf1rgWX5uhEdJRnMajmkaGkg/exec";
+const DRIVE_FOLDER = "11OZE6xSbCw4UpyRIg6bCNXRE9r79tCPG";
+
+// ---- ROOM LIST ----
+// To add a room: add a new line like { value: "71-XXXX", label: "71-XXXX (Description)" }
+// To remove a room: delete the line
+const ROOMS = [
+  { value: "71-0131", label: "71-0131 (PW CR & Gown)" },
+  { value: "71-0126", label: "71-0126 (Pre Gown — consolidate with PW CR)" },
+  { value: "71-0126A", label: "71-0126A (Gown — consolidate with PW CR)" },
+  { value: "71-0126B", label: "71-0126B (PW-AA)" },
+  { value: "71-0146", label: "71-0146 (PW-LaserBay)" },
+  { value: "71-0146A", label: "71-0146A (A-Cave)" },
+  { value: "71-0146B", label: "71-0146B (B-Cave)" },
+  { value: "71-0146C", label: "71-0146C (PW-TEA)" },
+  { value: "71-0146L", label: "71-0146L (L-Cave)" },
+  { value: "71-0146W", label: "71-0146W (A-Cave Gown — consolidate with A-Cave)" },
+  { value: "71-0148", label: "71-0148 (HTU Laser)" },
+  { value: "71-0148B", label: "71-0148B (HTU Supply — consolidate with HTU Laser)" }
+];
+
+// ---- QUESTION TYPES ----
+// "yes_no"      → Yes / No
+// "yes_no_na"   → N/A / Yes / No
+// "text"        → text input
+// "textarea"    → multiline text
+// "date"        → date picker
+// "select"      → dropdown (provide "options" array)
+// "radio"       → custom radio (provide "options" array)
+// "matrix"      → table of sub-questions (provide "rows" array, uses N/A / Yes / No)
+// "photo"       → photo upload
+// "triage"      → Yes / N/A toggle that shows/hides a "children" array of questions
+
+// ---- SECTIONS ----
+// To add a section: copy a section block and modify
+// To remove a section: delete the block
+// To reword: change the "text" string
+// To make required: add required: true
+const SECTIONS = [
+  {
+    id: "general_info",
+    title: "General Information",
+    questions: [
+      { id: "quest_date", text: "Date of QUEST", type: "date", required: true },
+      { id: "inspector_name", text: "Inspector Name", type: "text", placeholder: "Enter your name", required: true },
+      { id: "room_number", text: "Room / Lab Number", type: "select", required: true,
+        options: ROOMS.map(r => ({ value: r.value, label: r.label })).concat([{ value: "other", label: "Other (specify below)" }])
+      },
+      { id: "room_number_other", text: "If Other, specify room number", type: "text", placeholder: "Enter room number" }
+    ]
+  },
+  {
+    id: "general_safety",
+    title: "General Lab Safety",
+    questions: [
+      { id: "immediate_hazards", text: "Are there any immediate hazards?", type: "yes_no", required: true },
+      { id: "immediate_hazards_desc", text: "If yes, describe hazard and corrective action", type: "textarea", placeholder: "Describe hazard..." },
+      { id: "trip_fall", text: "Is there a trip and/or fall hazard?", type: "yes_no" },
+      { id: "trip_fall_desc", text: "If yes, describe hazard", type: "textarea", placeholder: "Describe trip/fall hazard..." },
+      { id: "loud_noise", text: "Are loud noise source controls in place?", type: "yes_no_na" },
+      { id: "sharp_tools", text: "Are sharp tools and broken glass disposed of properly?", type: "yes_no_na" },
+      { id: "outdated_signs", text: "Are there any outdated/incorrect/missing signs?", type: "yes_no" },
+      { id: "water_leak_equip", text: "Any water leaks or equipment exhibiting corrosion?", type: "yes_no" },
+      { id: "gas_cylinders", text: "Are gas cylinders properly restrained and capped?", type: "yes_no_na" },
+      { id: "machine_guarding", text: "Machine Guarding", type: "matrix", rows: [
+        { id: "mg_guards", text: "Are machine guards present?" },
+        { id: "mg_work", text: "Do guards allow work without impedance?" },
+        { id: "mg_bypass", text: "Is bypass of guard or interlock required?" }
+      ]},
+      { id: "cryo_systems", text: "Cryogenic Liquid Systems", type: "matrix", rows: [
+        { id: "cryo_cond", text: "Good condition (plumbing/valving)?" },
+        { id: "cryo_nozzle", text: "Safety nozzles present?" },
+        { id: "cryo_leaks", text: "Any visible leaks?" },
+        { id: "cryo_ppe", text: "PPE available?" },
+        { id: "cryo_sign", text: "Signage in place?" }
+      ]},
+      { id: "ventilation", text: "Ventilation Systems", type: "matrix", rows: [
+        { id: "vent_unclut", text: "Area uncluttered, sash down when not in use?" },
+        { id: "vent_sticker", text: "Current inspection sticker present?" }
+      ]},
+      { id: "gen_safety_comments", text: "Comments and/or recommendations", type: "textarea", placeholder: "Enter comments..." },
+      { id: "photos_gen", text: "Upload Pictures", type: "photo" }
+    ]
+  },
+  {
+    id: "ergonomics",
+    title: "Lab Ergonomics",
+    questions: [
+      { id: "ergo_support", text: "Are any ergonomic supports needed?", type: "yes_no" },
+      { id: "ergo_support_desc", text: "If yes, describe", type: "textarea", placeholder: "Describe ergonomic support needed..." },
+      { id: "ergo_posture", text: "Does the workstation support a good posture?", type: "yes_no" },
+      { id: "ergo_adjust", text: "Are work surfaces, tables, and chairs adjustable?", type: "yes_no_na" },
+      { id: "ergo_lighting", text: "Is there insufficient lighting?", type: "yes_no" },
+      { id: "ergo_comments", text: "Comments and/or recommendations", type: "textarea", placeholder: "Enter comments..." },
+      { id: "photos_ergo", text: "Upload Pictures", type: "photo" }
+    ]
+  },
+  {
+    id: "emergency",
+    title: "Emergency Preparedness",
+    questions: [
+      { id: "emergency_exit", text: "Are emergency exits clear and unobstructed? Exit signs illuminated?", type: "yes_no" },
+      { id: "earthquake_risk", text: "Items that could fall, tip, or break during earthquake?", type: "yes_no" },
+      { id: "fire_ext", text: "Are fire extinguishers accessible and charged?", type: "yes_no_na" },
+      { id: "emergency_comments", text: "Comments and/or recommendations", type: "textarea", placeholder: "Enter comments..." },
+      { id: "photos_emergency", text: "Upload Pictures", type: "photo" }
+    ]
+  },
+  {
+    id: "electrical",
+    title: "Electrical Safety",
+    questions: [
+      { id: "elec_panels", text: "Electrical Panels", type: "matrix", rows: [
+        { id: "elec_access", text: "Access unobstructed (36\" clearance)?" },
+        { id: "elec_breakers", text: "Breakers identified, panel good condition?" }
+      ]},
+      { id: "elec_outlets", text: "Outlets and Receptacles", type: "matrix", rows: [
+        { id: "outlet_cond", text: "Outlets/receptacles in good condition?" },
+        { id: "outlet_gfci", text: "GFCI present/verified where required?" }
+      ]},
+      { id: "elec_heat", text: "Are heat tapes properly connected?", type: "yes_no_na" },
+      { id: "ext_cords", text: "Extension Cords", type: "matrix", rows: [
+        { id: "ext_temp", text: "Used as temporary wiring only?" },
+        { id: "ext_cond", text: "Good condition, grounded (3-prong)?" },
+        { id: "ext_breaker", text: "Power strips have circuit breaker?" },
+        { id: "ext_daisy", text: "No daisy-chaining?" }
+      ]},
+      { id: "elec_comments", text: "Comments and/or recommendations", type: "textarea", placeholder: "Enter comments..." },
+      { id: "photos_elec", text: "Upload Pictures", type: "photo" }
+    ]
+  },
+  {
+    id: "soldering",
+    title: "Soldering",
+    questions: [
+      { id: "triage_solder", text: "Is there soldering performed within your area?", type: "triage", required: true,
+        children: [
+          { id: "solder_wpc", text: "Are soldering activities described by a WPC for this area?", type: "yes_no" },
+          { id: "solder_vent", text: "Identify means of ventilation for soldering", type: "radio", options: [
+            { value: "Open Air - No Mechanical Ventilation", label: "Open Air - No Mechanical Ventilation" },
+            { value: "Mechanical Ventilation - Fan", label: "Mechanical Ventilation - Fan" },
+            { value: "Mechanical Ventilation - Fume Extractor", label: "Mechanical Ventilation - Fume Extractor" },
+            { value: "N/A", label: "N/A - No soldering station" }
+          ]},
+          { id: "solder_permit", text: "Is there a hot work permit for soldering?", type: "radio", options: [
+            { value: "Yes", label: "Yes" },
+            { value: "No", label: "No - Soldering occurs but no permit" },
+            { value: "N/A", label: "N/A - No soldering station" }
+          ]}
+        ]
+      },
+      { id: "solder_comments", text: "Comments and/or recommendations", type: "textarea", placeholder: "Enter comments..." },
+      { id: "photos_solder", text: "Upload Pictures", type: "photo" }
+    ]
+  },
+  {
+    id: "chemical",
+    title: "Chemical Safety",
+    questions: [
+      { id: "triage_chem", text: "Are chemicals present in the area?", type: "triage", required: true,
+        children: [
+          { id: "chem_label", text: "Are all chemical containers properly labeled?", type: "yes_no" },
+          { id: "chem_sds", text: "Are SDS sheets accessible?", type: "yes_no" },
+          { id: "chem_storage", text: "Are chemicals stored properly (compatibility, containment)?", type: "yes_no" },
+          { id: "chem_inventory", text: "Is a chemical inventory maintained?", type: "yes_no" },
+          { id: "chem_expired", text: "Are there expired chemicals that need disposal?", type: "yes_no" },
+          { id: "chem_ppe", text: "Is appropriate PPE available for chemical handling?", type: "yes_no" },
+          { id: "chem_spill", text: "Are spill kits available and stocked?", type: "yes_no" },
+          { id: "chem_waste", text: "Is chemical waste properly labeled and stored?", type: "yes_no" }
+        ]
+      },
+      { id: "chem_comments", text: "Comments and/or recommendations", type: "textarea", placeholder: "Enter comments..." },
+      { id: "photos_chem", text: "Upload Pictures", type: "photo" }
+    ]
+  },
+  {
+    id: "laser",
+    title: "Laser Safety",
+    questions: [
+      { id: "triage_laser", text: "Are lasers present in the area?", type: "triage", required: true,
+        children: [
+          { id: "laser_matrix", text: "Laser Safety", type: "matrix", rows: [
+            { id: "laser_signs", text: "Are laser warning signs posted?" },
+            { id: "laser_goggles", text: "Are laser safety goggles available?" },
+            { id: "laser_beam", text: "Are beam paths enclosed where possible?" },
+            { id: "laser_sop", text: "Is a laser SOP available?" },
+            { id: "laser_interlock", text: "Are interlocks functional?" }
+          ]}
+        ]
+      },
+      { id: "laser_comments", text: "Comments and/or recommendations", type: "textarea", placeholder: "Enter comments..." },
+      { id: "photos_laser", text: "Upload Pictures", type: "photo" }
+    ]
+  },
+  {
+    id: "radiation",
+    title: "Radiation Safety",
+    questions: [
+      { id: "triage_rad", text: "Are radiation sources present?", type: "triage", required: true,
+        children: [
+          { id: "rad_matrix", text: "Radiation Safety", type: "matrix", rows: [
+            { id: "rad_signs", text: "Are radiation warning signs posted?" },
+            { id: "rad_dosimeter", text: "Are dosimeters available/worn?" },
+            { id: "rad_shield", text: "Is shielding adequate?" },
+            { id: "rad_survey", text: "Are survey instruments available and calibrated?" }
+          ]}
+        ]
+      },
+      { id: "rad_comments", text: "Comments and/or recommendations", type: "textarea", placeholder: "Enter comments..." },
+      { id: "photos_rad", text: "Upload Pictures", type: "photo" }
+    ]
+  },
+  {
+    id: "ppe",
+    title: "Personal Protective Equipment",
+    questions: [
+      { id: "ppe_wearing", text: "Are workers wearing appropriate PPE?", type: "yes_no" },
+      { id: "ppe_condition", text: "Is PPE in good condition?", type: "yes_no" },
+      { id: "ppe_visitors", text: "Is PPE readily available for visitors/guests?", type: "yes_no" },
+      { id: "ppe_glasses", text: "Are safety glasses/goggles available?", type: "yes_no_na" },
+      { id: "ppe_hearing", text: "Are hearing protectors available?", type: "yes_no_na" },
+      { id: "ppe_comments", text: "Comments and/or recommendations", type: "textarea", placeholder: "Enter comments..." },
+      { id: "photos_ppe", text: "Upload Pictures", type: "photo" }
+    ]
+  },
+  {
+    id: "review",
+    title: "Review & Submit",
+    questions: [
+      { id: "overall", text: "Overall Assessment", type: "radio", required: true, options: [
+        { value: "Satisfactory - No issues found", label: "✅ Satisfactory - No issues found" },
+        { value: "Minor Issues - Corrections needed", label: "⚠️ Minor Issues - Corrections needed" },
+        { value: "Major Issues - Immediate action required", label: "🚨 Major Issues - Immediate action required" }
+      ]},
+      { id: "final_notes", text: "Additional Notes", type: "textarea", placeholder: "Any additional observations or recommendations..." }
+    ]
+  }
+];
+
+// ============================================================
+// END CONFIGURATION
+// ============================================================
+// ============================================================
+// APP ENGINE - DO NOT EDIT BELOW UNLESS YOU KNOW WHAT YOU'RE DOING
+// ============================================================
+
+let cur = 0;
+let visited = new Set([0]);
+let photoStore = {};
+const TOTAL = SECTIONS.length;
+
+function init() {
+  buildNavDots();
+  buildSections();
+  updateButtons();
+  updateProgress();
+  // Set today's date
+  let dateEl = document.getElementById('q_quest_date');
+  if (dateEl) dateEl.valueAsDate = new Date();
 }
-updateButtons();
-document.getElementById('quest_date').valueAsDate=new Date();
+
+function buildNavDots() {
+  let nd = document.getElementById('navDots');
+  nd.innerHTML = '';
+  for (let i = 0; i < TOTAL; i++) {
+    let d = document.createElement('div');
+    d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    d.textContent = i + 1;
+    d.onclick = () => goTo(i);
+    nd.appendChild(d);
+  }
 }
 
-function goTo(n){
-if(n<0||n>=TOTAL)return;
-document.getElementById('section-'+cur).classList.remove('active');
-document.getElementById('section-'+n).classList.add('active');
-cur=n;
-visited.add(n);
-updateDots();
-updateButtons();
-updateProgress();
-window.scrollTo(0,0);
+function buildSections() {
+  let container = document.getElementById('appContainer');
+  container.innerHTML = '';
+  SECTIONS.forEach((sec, idx) => {
+    let div = document.createElement('div');
+    div.className = 'section' + (idx === 0 ? ' active' : '');
+    div.id = 'section-' + idx;
+    let html = '<div class="error-banner" id="error-' + idx + '">⚠️ Please complete the required fields highlighted below.</div>';
+    html += '<h2 class="section-title">' + sec.title + '</h2>';
+    sec.questions.forEach(q => {
+      html += renderQuestion(q);
+    });
+    div.innerHTML = html;
+    container.appendChild(div);
+  });
 }
 
-function navigate(dir){
-if(dir===1&&cur===TOTAL-1){submitForm();return;}
-goTo(cur+dir);
+function renderQuestion(q) {
+  let html = '';
+  switch (q.type) {
+    case 'date':
+      html += '<div class="card" data-qid="' + q.id + '"' + (q.required ? ' data-required="true"' : '') + '>';
+      html += '<label class="q' + (q.required ? ' required' : '') + '">' + q.text + '</label>';
+      html += '<input type="date" id="q_' + q.id + '">';
+      html += '</div>';
+      break;
+    case 'text':
+      html += '<div class="card" data-qid="' + q.id + '"' + (q.required ? ' data-required="true"' : '') + '>';
+      html += '<label class="q' + (q.required ? ' required' : '') + '">' + q.text + '</label>';
+      html += '<input type="text" id="q_' + q.id + '" placeholder="' + (q.placeholder || '') + '">';
+      html += '</div>';
+      break;
+    case 'textarea':
+      html += '<div class="card" data-qid="' + q.id + '">';
+      html += '<label class="q">' + q.text + '</label>';
+      html += '<textarea id="q_' + q.id + '" placeholder="' + (q.placeholder || '') + '"></textarea>';
+      html += '</div>';
+      break;
+    case 'select':
+      html += '<div class="card" data-qid="' + q.id + '"' + (q.required ? ' data-required="true"' : '') + '>';
+      html += '<label class="q' + (q.required ? ' required' : '') + '">' + q.text + '</label>';
+      html += '<select id="q_' + q.id + '">';
+      html += '<option value="">-- Select --</option>';
+      q.options.forEach(o => {
+        html += '<option value="' + o.value + '">' + o.label + '</option>';
+      });
+      html += '</select>';
+      html += '</div>';
+      break;
+    case 'yes_no':
+      html += '<div class="card" data-qid="' + q.id + '"' + (q.required ? ' data-required="true" data-type="radio"' : '') + '>';
+      html += '<label class="q' + (q.required ? ' required' : '') + '">' + q.text + '</label>';
+      html += '<div class="radio-group">';
+      html += '<label><input type="radio" name="q_' + q.id + '" value="Yes"><span>Yes</span></label>';
+      html += '<label><input type="radio" name="q_' + q.id + '" value="No"><span>No</span></label>';
+      html += '</div></div>';
+      break;
+    case 'yes_no_na':
+      html += '<div class="card" data-qid="' + q.id + '">';
+      html += '<label class="q">' + q.text + '</label>';
+      html += '<div class="radio-group">';
+      html += '<label><input type="radio" name="q_' + q.id + '" value="N/A"><span>N/A</span></label>';
+      html += '<label><input type="radio" name="q_' + q.id + '" value="Yes"><span>Yes</span></label>';
+      html += '<label><input type="radio" name="q_' + q.id + '" value="No"><span>No</span></label>';
+      html += '</div></div>';
+      break;
+    case 'radio':
+      html += '<div class="card" data-qid="' + q.id + '"' + (q.required ? ' data-required="true" data-type="radio"' : '') + '>';
+      html += '<label class="q' + (q.required ? ' required' : '') + '">' + q.text + '</label>';
+      html += '<div class="radio-group" style="flex-direction:column;">';
+      q.options.forEach(o => {
+        html += '<label><input type="radio" name="q_' + q.id + '" value="' + o.value + '"><span>' + o.label + '</span></label>';
+      });
+      html += '</div></div>';
+      break;
+    case 'matrix':
+      html += '<div class="card" data-qid="' + q.id + '">';
+      html += '<label class="q">' + q.text + '</label>';
+      html += '<div style="overflow-x:auto;"><table class="matrix-table">';
+      html += '<tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr>';
+      q.rows.forEach(r => {
+        html += '<tr><td>' + r.text + '</td>';
+        ['N/A', 'Yes', 'No'].forEach(v => {
+          html += '<td><input type="radio" name="q_' + r.id + '" value="' + v + '"></td>';
+        });
+        html += '</tr>';
+      });
+      html += '</table></div></div>';
+      break;
+    case 'triage':
+      html += '<div class="card triage-card" data-qid="' + q.id + '"' + (q.required ? ' data-required="true" data-type="radio"' : '') + '>';
+      html += '<label class="q' + (q.required ? ' required' : '') + '">' + q.text + '</label>';
+      html += '<div class="radio-group">';
+      html += '<label><input type="radio" name="q_' + q.id + '" value="Yes" onchange="toggleExpand(\'expand_' + q.id + '\',true)"><span>Yes</span></label>';
+      html += '<label><input type="radio" name="q_' + q.id + '" value="N/A" onchange="toggleExpand(\'expand_' + q.id + '\',false)"><span>N/A</span></label>';
+      html += '</div></div>';
+      html += '<div class="expandable" id="expand_' + q.id + '">';
+      if (q.children) {
+        q.children.forEach(child => {
+          html += renderQuestion(child);
+        });
+      }
+      html += '</div>';
+      break;
+    case 'photo':
+      let pid = 'preview_' + q.id;
+      html += '<div class="card" data-qid="' + q.id + '">';
+      html += '<label class="q">' + q.text + '</label>';
+      html += '<div class="photo-upload-area" onclick="document.getElementById(\'q_' + q.id + '\').click()">';
+      html += '<div class="icon">📷</div><p>Tap to take or upload photos</p></div>';
+      html += '<input type="file" id="q_' + q.id + '" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,\'' + pid + '\')">';
+      html += '<div class="photo-preview-container" id="' + pid + '"></div>';
+      html += '</div>';
+      break;
+  }
+  return html;
 }
 
-function updateDots(){
-let dots=document.querySelectorAll('.nav-dot');
-dots.forEach((d,i)=>{
-d.classList.remove('active','visited');
-if(i===cur)d.classList.add('active');
-else if(visited.has(i))d.classList.add('visited');
-});
+function toggleExpand(id, show) {
+  let el = document.getElementById(id);
+  if (!el) return;
+  if (show) el.classList.add('open');
+  else el.classList.remove('open');
 }
 
-function updateButtons(){
-let bp=document.getElementById('btnPrev');
-let bn=document.getElementById('btnNext');
-bp.style.display=cur===0?'none':'block';
-if(cur===TOTAL-1){
-bn.textContent='Submit ✓';
-bn.className='btn btn-submit';
-}else{
-bn.textContent='Next →';
-bn.className='btn btn-next';
-}
-}
-
-function updateProgress(){
-let pct=((cur+1)/TOTAL)*100;
-document.getElementById('progressFill').style.width=pct+'%';
+function goTo(n) {
+  if (n < 0 || n >= TOTAL) return;
+  document.getElementById('section-' + cur).classList.remove('active');
+  document.getElementById('section-' + n).classList.add('active');
+  cur = n;
+  visited.add(n);
+  updateDots();
+  updateButtons();
+  updateProgress();
+  window.scrollTo(0, 0);
 }
 
-function toggleExpand(id,show){
-let el=document.getElementById(id);
-if(show)el.classList.add('open');
-else el.classList.remove('open');
+function navigate(dir) {
+  if (dir === 1 && cur === TOTAL - 1) { submitForm(); return; }
+  goTo(cur + dir);
 }
 
-function handlePhotos(input,previewId){
-let container=document.getElementById(previewId);
-if(!photoStore[previewId])photoStore[previewId]=[];
-Array.from(input.files).forEach(file=>{
-let reader=new FileReader();
-reader.onload=function(e){
-photoStore[previewId].push({name:file.name,data:e.target.result});
-let wrapper=document.createElement('div');
-wrapper.className='photo-thumb-wrapper';
-let img=document.createElement('img');
-img.className='photo-thumb';
-img.src=e.target.result;
-let btn=document.createElement('button');
-btn.className='photo-remove';
-btn.textContent='✕';
-btn.onclick=function(){
-let idx=Array.from(container.children).indexOf(wrapper);
-photoStore[previewId].splice(idx,1);
-wrapper.remove();
-};
-wrapper.appendChild(img);
-wrapper.appendChild(btn);
-container.appendChild(wrapper);
-};
-reader.readAsDataURL(file);
-});
-input.value='';
+function updateDots() {
+  let dots = document.querySelectorAll('.nav-dot');
+  dots.forEach((d, i) => {
+    d.classList.remove('active', 'visited');
+    if (i === cur) d.classList.add('active');
+    else if (visited.has(i)) d.classList.add('visited');
+  });
 }
 
-function getRadio(name){
-let el=document.querySelector('input[name="'+name+'"]:checked');
-return el?el.value:'';
+function updateButtons() {
+  let bp = document.getElementById('btnPrev');
+  let bn = document.getElementById('btnNext');
+  bp.style.display = cur === 0 ? 'none' : 'block';
+  if (cur === TOTAL - 1) {
+    bn.textContent = 'Submit ✓';
+    bn.className = 'btn btn-submit';
+  } else {
+    bn.textContent = 'Next →';
+    bn.className = 'btn btn-next';
+  }
 }
 
-function getVal(id){
-let el=document.getElementById(id);
-return el?el.value:'';
+function updateProgress() {
+  let pct = ((cur + 1) / TOTAL) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
 }
 
-function collectAllPhotos(){
-let all=[];
-Object.keys(photoStore).forEach(key=>{
-photoStore[key].forEach(p=>{
-all.push({section:key.replace('preview_',''),name:p.name,data:p.data});
-});
-});
-return all;
+function handlePhotos(input, previewId) {
+  let container = document.getElementById(previewId);
+  if (!photoStore[previewId]) photoStore[previewId] = [];
+  Array.from(input.files).forEach(file => {
+    let reader = new FileReader();
+    reader.onload = function (e) {
+      photoStore[previewId].push({ name: file.name, data: e.target.result });
+      let wrapper = document.createElement('div');
+      wrapper.className = 'photo-thumb-wrapper';
+      let img = document.createElement('img');
+      img.className = 'photo-thumb';
+      img.src = e.target.result;
+      let btn = document.createElement('button');
+      btn.className = 'photo-remove';
+      btn.textContent = '✕';
+      btn.onclick = function () {
+        let idx = Array.from(container.children).indexOf(wrapper);
+        photoStore[previewId].splice(idx, 1);
+        wrapper.remove();
+      };
+      wrapper.appendChild(img);
+      wrapper.appendChild(btn);
+      container.appendChild(wrapper);
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
 }
 
-function submitForm(){
-let date=getVal('quest_date');
-let name=getVal('inspector_name');
-let room=getVal('room_number');
-if(!date||!name||!room){
-alert('Please fill in Date, Inspector Name, and Room Number.');
-goTo(0);
-return;
+function getRadio(name) {
+  let el = document.querySelector('input[name="' + name + '"]:checked');
+  return el ? el.value : '';
 }
 
-document.getElementById('loadingOverlay').classList.add('active');
-
-let photos=collectAllPhotos();
-
-let data={
-timestamp:new Date().toISOString(),
-quest_date:date,
-inspector_name:name,
-room_number:room,
-immediate_hazards:getRadio('immediate_hazards'),
-immediate_hazards_desc:getVal('immediate_hazards_desc'),
-trip_fall:getRadio('trip_fall'),
-trip_fall_desc:getVal('trip_fall_desc'),
-loud_noise:getRadio('loud_noise'),
-sharp_tools:getRadio('sharp_tools'),
-outdated_signs:getRadio('outdated_signs'),
-water_leak_equip:getRadio('water_leak_equip'),
-gas_cylinders:getRadio('gas_cylinders'),
-mg_guards:getRadio('mg_guards'),
-mg_work:getRadio('mg_work'),
-mg_bypass:getRadio('mg_bypass'),
-cryo_cond:getRadio('cryo_cond'),
-cryo_nozzle:getRadio('cryo_nozzle'),
-cryo_leaks:getRadio('cryo_leaks'),
-cryo_ppe:getRadio('cryo_ppe'),
-cryo_sign:getRadio('cryo_sign'),
-vent_unclut:getRadio('vent_unclut'),
-vent_sticker:getRadio('vent_sticker'),
-gen_safety_comments:getVal('gen_safety_comments'),
-ergo_support:getRadio('ergo_support'),
-ergo_support_desc:getVal('ergo_support_desc'),
-ergo_posture:getRadio('ergo_posture'),
-ergo_adjust:getRadio('ergo_adjust'),
-ergo_lighting:getRadio('ergo_lighting'),
-ergo_comments:getVal('ergo_comments'),
-emergency_exit:getRadio('emergency_exit'),
-earthquake_risk:getRadio('earthquake_risk'),
-fire_ext:getRadio('fire_ext'),
-emergency_comments:getVal('emergency_comments'),
-elec_panels:getRadio('elec_panels'),
-elec_breakers:getRadio('elec_breakers'),
-elec_outlets:getRadio('elec_outlets'),
-elec_gfci:getRadio('elec_gfci'),
-elec_heat:getRadio('elec_heat'),
-ext_temp:getRadio('ext_temp'),
-ext_cond:getRadio('ext_cond'),
-ext_breaker:getRadio('ext_breaker'),
-ext_daisy:getRadio('ext_daisy'),
-elec_comments:getVal('elec_comments'),
-triage_solder:getRadio('triage_solder'),
-solder_wpc:getRadio('solder_wpc'),
-solder_vent:getRadio('solder_vent'),
-solder_permit:getRadio('solder_permit'),
-solder_comments:getVal('solder_comments'),
-triage_chem:getRadio('triage_chem'),
-chem_label:getRadio('chem_label'),
-chem_sds:getRadio('chem_sds'),
-chem_storage:getRadio('chem_storage'),
-chem_inventory:getRadio('chem_inventory'),
-chem_expired:getRadio('chem_expired'),
-chem_ppe:getRadio('chem_ppe'),
-chem_spill:getRadio('chem_spill'),
-chem_waste:getRadio('chem_waste'),
-chem_comments:getVal('chem_comments'),
-triage_laser:getRadio('triage_laser'),
-laser_signs:getRadio('laser_signs'),
-laser_goggles:getRadio('laser_goggles'),
-laser_beam:getRadio('laser_beam'),
-laser_sop:getRadio('laser_sop'),
-laser_interlock:getRadio('laser_interlock'),
-laser_comments:getVal('laser_comments'),
-triage_rad:getRadio('triage_rad'),
-rad_signs:getRadio('rad_signs'),
-rad_dosimeter:getRadio('rad_dosimeter'),
-rad_shield:getRadio('rad_shield'),
-rad_survey:getRadio('rad_survey'),
-rad_comments:getVal('rad_comments'),
-ppe_wearing:getRadio('ppe_wearing'),
-ppe_condition:getRadio('ppe_condition'),
-ppe_visitors:getRadio('ppe_visitors'),
-ppe_glasses:getRadio('ppe_glasses'),
-ppe_hearing:getRadio('ppe_hearing'),
-ppe_comments:getVal('ppe_comments'),
-overall:getRadio('overall'),
-final_notes:getVal('final_notes'),
-photo_count:photos.length
-};
-
-let payload={
-action:'submit',
-folderId:DRIVE_FOLDER,
-data:data,
-photos:photos
-};
-
-fetch(SHEET_URL,{
-method:'POST',
-mode:'no-cors',
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify(payload)
-}).then(()=>{
-document.getElementById('loadingOverlay').classList.remove('active');
-document.getElementById('modalOverlay').classList.add('active');
-}).catch(err=>{
-document.getElementById('loadingOverlay').classList.remove('active');
-alert('Submission error: '+err.message+'. Please try again.');
-});
+function getVal(id) {
+  let el = document.getElementById(id);
+  return el ? el.value : '';
 }
 
-document.addEventListener('DOMContentLoaded',init);
+function validateRequired() {
+  // Clear all errors first
+  document.querySelectorAll('.card.error').forEach(c => c.classList.remove('error'));
+  document.querySelectorAll('.error-banner.show').forEach(b => b.classList.remove('show'));
+
+  let firstErrorSection = -1;
+  let firstErrorCard = null;
+
+  SECTIONS.forEach((sec, secIdx) => {
+    let sectionHasError = false;
+    sec.questions.forEach(q => {
+      let missing = checkMissing(q);
+      if (missing) {
+        let card = document.querySelector('[data-qid="' + q.id + '"]');
+        if (card) card.classList.add('error');
+        sectionHasError = true;
+        if (firstErrorSection === -1) {
+          firstErrorSection = secIdx;
+          firstErrorCard = card;
+        }
+      }
+      // Check triage children too
+      if (q.type === 'triage' && q.children && getRadio('q_' + q.id) === 'Yes') {
+        q.children.forEach(child => {
+          let cm = checkMissing(child);
+          if (cm) {
+            let card = document.querySelector('[data-qid="' + child.id + '"]');
+            if (card) card.classList.add('error');
+            sectionHasError = true;
+            if (firstErrorSection === -1) {
+              firstErrorSection = secIdx;
+              firstErrorCard = card;
+            }
+          }
+        });
+      }
+    });
+    if (sectionHasError) {
+      let banner = document.getElementById('error-' + secIdx);
+      if (banner) banner.classList.add('show');
+    }
+  });
+
+  if (firstErrorSection !== -1) {
+    goTo(firstErrorSection);
+    setTimeout(() => {
+      if (firstErrorCard) firstErrorCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 350);
+    return false;
+  }
+  return true;
+}
+
+function checkMissing(q) {
+  if (!q.required) return false;
+  if (q.type === 'text' || q.type === 'date') {
+    return !getVal('q_' + q.id);
+  }
+  if (q.type === 'select') {
+    let v = getVal('q_' + q.id);
+    if (!v) return true;
+    if (v === 'other' && !getVal('q_' + q.id + '_other')) return true;
+    return false;
+  }
+  if (q.type === 'yes_no' || q.type === 'yes_no_na' || q.type === 'radio' || q.type === 'triage') {
+    return !getRadio('q_' + q.id);
+  }
+  return false;
+}
+
+function collectData() {
+  let data = { timestamp: new Date().toISOString() };
+  SECTIONS.forEach(sec => {
+    sec.questions.forEach(q => {
+      collectQuestionData(q, data);
+    });
+  });
+  // Handle room_number "other"
+  if (data.room_number === 'other') {
+    data.room_number = data.room_number_other || 'Other';
+  }
+  // Photo count
+  let photos = collectAllPhotos();
+  data.photo_count = photos.length;
+  return data;
+}
+
+function collectQuestionData(q, data) {
+  switch (q.type) {
+    case 'date':
+    case 'text':
+    case 'textarea':
+      data[q.id] = getVal('q_' + q.id);
+      break;
+    case 'select':
+      data[q.id] = getVal('q_' + q.id);
+      break;
+    case 'yes_no':
+    case 'yes_no_na':
+    case 'radio':
+    case 'triage':
+      data[q.id] = getRadio('q_' + q.id);
+      break;
+    case 'matrix':
+      q.rows.forEach(r => {
+        data[r.id] = getRadio('q_' + r.id);
+      });
+      break;
+    case 'photo':
+      // handled separately
+      break;
+  }
+  // Triage children
+  if (q.type === 'triage' && q.children) {
+    q.children.forEach(child => {
+      collectQuestionData(child, data);
+    });
+  }
+}
+
+function collectAllPhotos() {
+  let all = [];
+  Object.keys(photoStore).forEach(key => {
+    photoStore[key].forEach(p => {
+      all.push({ section: key.replace('preview_photos_', ''), name: p.name, data: p.data });
+    });
+  });
+  return all;
+}
+
+function submitForm() {
+  if (!validateRequired()) return;
+
+  document.getElementById('loadingOverlay').classList.add('active');
+
+  let data = collectData();
+  let photos = collectAllPhotos();
+
+  let payload = {
+    action: 'submit',
+    folderId: DRIVE_FOLDER,
+    data: data,
+    photos: photos
+  };
+
+  fetch(SHEET_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    mode: 'no-cors'
+  }).then(() => {
+    document.getElementById('loadingOverlay').classList.remove('active');
+    document.getElementById('modalOverlay').classList.add('active');
+  }).catch(err => {
+    document.getElementById('loadingOverlay').classList.remove('active');
+    alert('Submission error: ' + err.message + '. Please try again.');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
