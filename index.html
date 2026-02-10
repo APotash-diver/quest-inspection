@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>BELLA Lab QUEST Inspection</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f2f5;color:#1a1a1a;padding-bottom:80px;-webkit-text-size-adjust:100%}
+.header{background:linear-gradient(135deg,#1a365d 0%,#2563eb 100%);color:#fff;padding:20px 16px 14px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.header h1{font-size:1.3em;margin-bottom:2px}
+.header p{font-size:.78em;opacity:.85}
+.progress-bar{width:100%;height:4px;background:rgba(255,255,255,.2);margin-top:10px;border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:#34d399;width:10%;transition:width .4s ease;border-radius:2px}
+.nav-dots{display:flex;justify-content:center;gap:6px;padding:12px 16px;background:#fff;border-bottom:1px solid #e5e7eb;flex-wrap:wrap}
+.nav-dot{width:28px;height:28px;border-radius:50%;border:2px solid #cbd5e1;background:#fff;font-size:.7em;font-weight:600;color:#94a3b8;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s ease}
+.nav-dot.active{border-color:#2563eb;background:#2563eb;color:#fff}
+.nav-dot.visited{border-color:#34d399;background:#ecfdf5;color:#059669}
+.section{display:none;padding:16px;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section-title{font-size:1.2em;color:#1a365d;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #2563eb}
+.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid #e5e7eb}
+.card.triage-card{border-left:4px solid #2563eb;background:#f0f7ff}
+.q{display:block;font-weight:600;font-size:.92em;margin-bottom:10px;color:#1e293b;line-height:1.4}
+.q.required::after{content:' *';color:#dc2626}
+.radio-group{display:flex;gap:8px;flex-wrap:wrap}
+.radio-group label{flex:1;min-width:70px;cursor:pointer}
+.radio-group label span{display:block;text-align:center;padding:10px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:.85em;font-weight:500;transition:all .2s ease;background:#fff}
+.radio-group input[type="radio"]{display:none}
+.radio-group input[type="radio"]:checked+span{border-color:#2563eb;background:#eff6ff;color:#1d4ed8;font-weight:600}
+input[type="text"],input[type="date"],textarea,select{width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:.95em;font-family:inherit;transition:border-color .2s;-webkit-appearance:none}
+input[type="text"]:focus,input[type="date"]:focus,textarea:focus,select:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+textarea{min-height:80px;resize:vertical}
+select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 12px center;padding-right:32px}
+.matrix-table{width:100%;border-collapse:collapse;font-size:.85em;margin-top:6px}
+.matrix-table th,.matrix-table td{padding:10px 6px;border-bottom:1px solid #f1f5f9;text-align:center}
+.matrix-table th{font-weight:600;color:#475569;font-size:.85em}
+.matrix-table td:first-child{text-align:left;font-weight:500}
+.matrix-table input[type="radio"]{display:inline-block;width:18px;height:18px;accent-color:#2563eb}
+.btn-row{display:flex;gap:10px;padding:16px;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;box-shadow:0 -2px 10px rgba(0,0,0,.05);z-index:100}
+.btn{flex:1;padding:14px;border:none;border-radius:10px;font-size:.95em;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-prev{background:#f1f5f9;color:#475569}
+.btn-next{background:#2563eb;color:#fff}
+.btn-submit{background:#059669;color:#fff}
+.btn:active{transform:scale(.97)}
+.photo-upload-area{border:2px dashed #cbd5e1;border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;background:#f8fafc}
+.photo-upload-area:active{border-color:#2563eb;background:#eff6ff}
+.photo-upload-area .icon{font-size:2em;margin-bottom:6px}
+.photo-upload-area p{font-size:.85em;color:#64748b}
+.hidden{display:none}
+.photo-preview-container{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.photo-thumb-wrapper{position:relative;width:80px;height:80px}
+.photo-thumb{width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid #e2e8f0}
+.photo-remove{position:absolute;top:-6px;right:-6px;width:22px;height:22px;background:#dc2626;color:#fff;border:none;border-radius:50%;font-size:.75em;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.expandable{max-height:0;overflow:hidden;transition:max-height .5s ease,opacity .3s ease;opacity:0}
+.expandable.open{max-height:5000px;opacity:1}
+#loadingOverlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center}
+#loadingOverlay.active{display:flex}
+.spinner{width:50px;height:50px;border:4px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#modalOverlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center}
+#modalOverlay.active{display:flex}
+.modal{background:#fff;border-radius:16px;padding:32px 24px;margin:20px;text-align:center;max-width:340px}
+.modal .checkmark{font-size:3em;margin-bottom:12px}
+.modal h2{margin-bottom:8px;color:#059669}
+.modal p{font-size:.9em;color:#64748b;margin-bottom:20px}
+.modal button{padding:12px 32px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:1em;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>🔬 BELLA Lab QUEST Inspection</h1>
+<p>Quarterly Safety &amp; Environment Walk-through</p>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+<div class="nav-dots" id="navDots"></div>
+
+<!-- SECTION 0: General Info -->
+<div class="section active" id="section-0">
+<h2 class="section-title">General Information</h2>
+<div class="card"><label class="q required">Date of QUEST</label><input type="date" id="quest_date"></div>
+<div class="card"><label class="q required">Inspector Name</label><input type="text" id="inspector_name" placeholder="Enter your name"></div>
+<div class="card"><label class="q required">Room / Lab Number</label><input type="text" id="room_number" placeholder="e.g. 71-207"></div>
+</div>
+
+<!-- SECTION 1: General Lab Safety -->
+<div class="section" id="section-1">
+<h2 class="section-title">General Lab Safety</h2>
+<div class="card"><label class="q required">Are there any immediate hazards?</label><div class="radio-group"><label><input type="radio" name="immediate_hazards" value="Yes"><span>Yes</span></label><label><input type="radio" name="immediate_hazards" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">If yes, describe hazard and corrective action</label><textarea id="immediate_hazards_desc" placeholder="Describe hazard..."></textarea></div>
+<div class="card"><label class="q">Is there a trip and/or fall hazard?</label><div class="radio-group"><label><input type="radio" name="trip_fall" value="Yes"><span>Yes</span></label><label><input type="radio" name="trip_fall" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">If yes, describe hazard</label><textarea id="trip_fall_desc" placeholder="Describe trip/fall hazard..."></textarea></div>
+<div class="card"><label class="q">Are loud noise source controls in place?</label><div class="radio-group"><label><input type="radio" name="loud_noise" value="N/A"><span>N/A</span></label><label><input type="radio" name="loud_noise" value="Yes"><span>Yes</span></label><label><input type="radio" name="loud_noise" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Are sharp tools and broken glass disposed of properly?</label><div class="radio-group"><label><input type="radio" name="sharp_tools" value="N/A"><span>N/A</span></label><label><input type="radio" name="sharp_tools" value="Yes"><span>Yes</span></label><label><input type="radio" name="sharp_tools" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Are there any outdated/incorrect/missing signs?</label><div class="radio-group"><label><input type="radio" name="outdated_signs" value="Yes"><span>Yes</span></label><label><input type="radio" name="outdated_signs" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Any water leaks or equipment exhibiting corrosion?</label><div class="radio-group"><label><input type="radio" name="water_leak_equip" value="Yes"><span>Yes</span></label><label><input type="radio" name="water_leak_equip" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Are gas cylinders properly restrained and capped?</label><div class="radio-group"><label><input type="radio" name="gas_cylinders" value="N/A"><span>N/A</span></label><label><input type="radio" name="gas_cylinders" value="Yes"><span>Yes</span></label><label><input type="radio" name="gas_cylinders" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Machine Guarding</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Are machine guards present?</td><td><input type="radio" name="mg_guards" value="N/A"></td><td><input type="radio" name="mg_guards" value="Yes"></td><td><input type="radio" name="mg_guards" value="No"></td></tr><tr><td>Do guards allow work without impedance?</td><td><input type="radio" name="mg_work" value="N/A"></td><td><input type="radio" name="mg_work" value="Yes"></td><td><input type="radio" name="mg_work" value="No"></td></tr><tr><td>Is bypass of guard or interlock required?</td><td><input type="radio" name="mg_bypass" value="N/A"></td><td><input type="radio" name="mg_bypass" value="Yes"></td><td><input type="radio" name="mg_bypass" value="No"></td></tr></table></div></div>
+<div class="card"><label class="q">Cryogenic Liquid Systems</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Good condition (plumbing/valving)?</td><td><input type="radio" name="cryo_cond" value="N/A"></td><td><input type="radio" name="cryo_cond" value="Yes"></td><td><input type="radio" name="cryo_cond" value="No"></td></tr><tr><td>Safety nozzles present?</td><td><input type="radio" name="cryo_nozzle" value="N/A"></td><td><input type="radio" name="cryo_nozzle" value="Yes"></td><td><input type="radio" name="cryo_nozzle" value="No"></td></tr><tr><td>Any visible leaks?</td><td><input type="radio" name="cryo_leaks" value="N/A"></td><td><input type="radio" name="cryo_leaks" value="Yes"></td><td><input type="radio" name="cryo_leaks" value="No"></td></tr><tr><td>PPE available?</td><td><input type="radio" name="cryo_ppe" value="N/A"></td><td><input type="radio" name="cryo_ppe" value="Yes"></td><td><input type="radio" name="cryo_ppe" value="No"></td></tr><tr><td>Signage in place?</td><td><input type="radio" name="cryo_sign" value="N/A"></td><td><input type="radio" name="cryo_sign" value="Yes"></td><td><input type="radio" name="cryo_sign" value="No"></td></tr></table></div></div>
+<div class="card"><label class="q">Ventilation Systems</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Area uncluttered, sash down when not in use?</td><td><input type="radio" name="vent_unclut" value="N/A"></td><td><input type="radio" name="vent_unclut" value="Yes"></td><td><input type="radio" name="vent_unclut" value="No"></td></tr><tr><td>Current inspection sticker present?</td><td><input type="radio" name="vent_sticker" value="N/A"></td><td><input type="radio" name="vent_sticker" value="Yes"></td><td><input type="radio" name="vent_sticker" value="No"></td></tr></table></div></div>
+<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="gen_safety_comments" placeholder="Enter comments..."></textarea></div>
+<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_gen').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_gen" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_gen')"><div class="photo-preview-container" id="preview_gen"></div></div>
+</div>
+
+<!-- SECTION 2: Ergonomics -->
+<div class="section" id="section-2">
+<h2 class="section-title">Lab Ergonomics</h2>
+<div class="card"><label class="q">Are any ergonomic supports needed?</label><div class="radio-group"><label><input type="radio" name="ergo_support" value="Yes"><span>Yes</span></label><label><input type="radio" name="ergo_support" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">If yes, describe</label><textarea id="ergo_support_desc" placeholder="Describe ergonomic support needed..."></textarea></div>
+<div class="card"><label class="q">Does the workstation support a good posture?</label><div class="radio-group"><label><input type="radio" name="ergo_posture" value="Yes"><span>Yes</span></label><label><input type="radio" name="ergo_posture" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Are work surfaces, tables, and chairs adjustable?</label><div class="radio-group"><label><input type="radio" name="ergo_adjust" value="N/A"><span>N/A</span></label><label><input type="radio" name="ergo_adjust" value="Yes"><span>Yes</span></label><label><input type="radio" name="ergo_adjust" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Is there insufficient lighting?</label><div class="radio-group"><label><input type="radio" name="ergo_lighting" value="Yes"><span>Yes</span></label><label><input type="radio" name="ergo_lighting" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="ergo_comments" placeholder="Enter comments..."></textarea></div>
+<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_ergo').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_ergo" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_ergo')"><div class="photo-preview-container" id="preview_ergo"></div></div>
+</div>
+
+<!-- SECTION 3: Emergency Preparedness -->
+<div class="section" id="section-3">
+<h2 class="section-title">Emergency Preparedness</h2>
+<div class="card"><label class="q">Are emergency exits clear and unobstructed? Exit signs illuminated?</label><div class="radio-group"><label><input type="radio" name="emergency_exit" value="Yes"><span>Yes</span></label><label><input type="radio" name="emergency_exit" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Items that could fall, tip, or break during earthquake?</label><div class="radio-group"><label><input type="radio" name="earthquake_risk" value="Yes"><span>Yes</span></label><label><input type="radio" name="earthquake_risk" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Are fire extinguishers accessible and charged?</label><div class="radio-group"><label><input type="radio" name="fire_ext" value="N/A"><span>N/A</span></label><label><input type="radio" name="fire_ext" value="Yes"><span>Yes</span></label><label><input type="radio" name="fire_ext" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="emergency_comments" placeholder="Enter comments..."></textarea></div>
+<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_emergency').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_emergency" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_emergency')"><div class="photo-preview-container" id="preview_emergency"></div></div>
+</div>
+
+<!-- SECTION 4: Electrical Safety -->
+<div class="section" id="section-4">
+<h2 class="section-title">Electrical Safety</h2>
+<div class="card"><label class="q">Electrical Panels</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Access unobstructed (36" clearance)?</td><td><input type="radio" name="elec_panels" value="N/A"></td><td><input type="radio" name="elec_panels" value="Yes"></td><td><input type="radio" name="elec_panels" value="No"></td></tr><tr><td>Breakers identified, panel good condition?</td><td><input type="radio" name="elec_breakers" value="N/A"></td><td><input type="radio" name="elec_breakers" value="Yes"></td><td><input type="radio" name="elec_breakers" value="No"></td></tr></table></div></div>
+<div class="card"><label class="q">Outlets and Receptacles</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Outlets/receptacles in good condition?</td><td><input type="radio" name="elec_outlets" value="N/A"></td><td><input type="radio" name="elec_outlets" value="Yes"></td><td><input type="radio" name="elec_outlets" value="No"></td></tr><tr><td>GFCI present/verified where required?</td><td><input type="radio" name="elec_gfci" value="N/A"></td><td><input type="radio" name="elec_gfci" value="Yes"></td><td><input type="radio" name="elec_gfci" value="No"></td></tr></table></div></div>
+<div class="card"><label class="q">Are heat tapes properly connected?</label><div class="radio-group"><label><input type="radio" name="elec_heat" value="N/A"><span>N/A</span></label><label><input type="radio" name="elec_heat" value="Yes"><span>Yes</span></label><label><input type="radio" name="elec_heat" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Extension Cords</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Used as temporary wiring only?</td><td><input type="radio" name="ext_temp" value="N/A"></td><td><input type="radio" name="ext_temp" value="Yes"></td><td><input type="radio" name="ext_temp" value="No"></td></tr><tr><td>Good condition, grounded (3-prong)?</td><td><input type="radio" name="ext_cond" value="N/A"></td><td><input type="radio" name="ext_cond" value="Yes"></td><td><input type="radio" name="ext_cond" value="No"></td></tr><tr><td>Power strips have circuit breaker?</td><td><input type="radio" name="ext_breaker" value="N/A"></td><td><input type="radio" name="ext_breaker" value="Yes"></td><td><input type="radio" name="ext_breaker" value="No"></td></tr><tr><td>No daisy-chaining?</td><td><input type="radio" name="ext_daisy" value="N/A"></td><td><input type="radio" name="ext_daisy" value="Yes"></td><td><input type="radio" name="ext_daisy" value="No"></td></tr></table></div></div>
+<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="elec_comments" placeholder="Enter comments..."></textarea></div>
+<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_elec').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_elec" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_elec')"><div class="photo-preview-container" id="preview_elec"></div></div>
+</div><!-- SECTION 5: Soldering -->
+<div class="section" id="section-5">
+<h2 class="section-title">Soldering</h2>
+<div class="card triage-card"><label class="q required">Is there soldering performed within your area?</label><div class="radio-group"><label><input type="radio" name="triage_solder" value="Yes" onchange="toggleExpand('solder_details',true)"><span>Yes</span></label><label><input type="radio" name="triage_solder" value="N/A" onchange="toggleExpand('solder_details',false)"><span>N/A</span></label></div></div>
+<div class="expandable" id="solder_details">
+<div class="card"><label class="q">Are soldering activities described by a WPC for this area?</label><div class="radio-group"><label><input type="radio" name="solder_wpc" value="Yes"><span>Yes</span></label><label><input type="radio" name="solder_wpc" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Identify means of ventilation for soldering</label><div class="radio-group" style="flex-direction:column;"><label><input type="radio" name="solder_vent" value="Open Air - No Mechanical Ventilation"><span>Open Air - No Mechanical Ventilation</span></label><label><input type="radio" name="solder_vent" value="Mechanical Ventilation - Fan"><span>Mechanical Ventilation - Fan</span></label><label><input type="radio" name="solder_vent" value="Mechanical Ventilation - Fume Extractor"><span>Mechanical Ventilation - Fume Extractor</span></label><label><input type="radio" name="solder_vent" value="N/A"><span>N/A - No soldering station</span></label></div></div>
+<div class="card"><label class="q">Is there a hot work permit for soldering?</label><div class="radio-group" style="flex-direction:column;"><label><input type="radio" name="solder_permit" value="Yes"><span>Yes</span></label><label><input type="radio" name="solder_permit" value="No"><span>No - Soldering occurs but no permit</span></label><label><input type="radio" name="solder_permit" value="N/A"><span>N/A - No soldering station</span></label></div></div>
+</div>
+<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="solder_comments" placeholder="Enter comments..."></textarea></div>
+<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_solder').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_solder" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_solder')"><div class="photo-preview-container" id="preview_solder"></div></div>
+</div>
+
+<!-- SECTION 6: Chemical Safety -->
+<div class="section" id="section-6">
+<h2 class="section-title">Chemical Safety</h2>
+<div class="card triage-card"><label class="q required">Are chemicals present in the area?</label><div class="radio-group"><label><input type="radio" name="triage_chem" value="Yes" onchange="toggleExpand('chem_details',true)"><span>Yes</span></label><label><input type="radio" name="triage_chem" value="N/A" onchange="toggleExpand('chem_details',false)"><span>N/A</span></label></div></div>
+<div class="expandable" id="chem_details">
+<div class="card"><label class="q">Are all chemical containers properly labeled?</label><div class="radio-group"><label><input type="radio" name="chem_label" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_label" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Are SDS sheets accessible?</label><div class="radio-group"><label><input type="radio" name="chem_sds" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_sds" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Are chemicals stored properly (compatibility, containment)?</label><div class="radio-group"><label><input type="radio" name="chem_storage" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_storage" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Is a chemical inventory maintained?</label><div class="radio-group"><label><input type="radio" name="chem_inventory" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_inventory" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Are there expired chemicals that need disposal?</label><div class="radio-group"><label><input type="radio" name="chem_expired" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_expired" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Is appropriate PPE available for chemical handling?</label><div class="radio-group"><label><input type="radio" name="chem_ppe" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_ppe" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Are spill kits available and stocked?</label><div class="radio-group"><label><input type="radio" name="chem_spill" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_spill" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Is chemical waste properly labeled and stored?</label><div class="radio-group"><label><input type="radio" name="chem_waste" value="Yes"><span>Yes</span></label><label><input type="radio" name="chem_waste" value="No"><span>No</span></label></div></div>
+</div>
+<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="chem_comments" placeholder="Enter comments..."></textarea></div>
+<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_chem').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_chem" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_chem')"><div class="photo-preview-container" id="preview_chem"></div></div>
+</div>
+
+<!-- SECTION 7: Laser Safety -->
+<div class="section" id="section-7">
+<h2 class="section-title">Laser Safety</h2>
+<div class="card triage-card"><label class="q required">Are lasers present in the area?</label><div class="radio-group"><label><input type="radio" name="triage_laser" value="Yes" onchange="toggleExpand('laser_details',true)"><span>Yes</span></label><label><input type="radio" name="triage_laser" value="N/A" onchange="toggleExpand('laser_details',false)"><span>N/A</span></label></div></div>
+<div class="expandable" id="laser_details">
+<div class="card"><label class="q">Laser Safety</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Are laser warning signs posted?</td><td><input type="radio" name="laser_signs" value="N/A"></td><td><input type="radio" name="laser_signs" value="Yes"></td><td><input type="radio" name="laser_signs" value="No"></td></tr><tr><td>Are laser safety goggles available?</td><td><input type="radio" name="laser_goggles" value="N/A"></td><td><input type="radio" name="laser_goggles" value="Yes"></td><td><input type="radio" name="laser_goggles" value="No"></td></tr><tr><td>Are beam paths enclosed where possible?</td><td><input type="radio" name="laser_beam" value="N/A"></td><td><input type="radio" name="laser_beam" value="Yes"></td><td><input type="radio" name="laser_beam" value="No"></td></tr><tr><td>Is a laser SOP available?</td><td><input type="radio" name="laser_sop" value="N/A"></td><td><input type="radio" name="laser_sop" value="Yes"></td><td><input type="radio" name="laser_sop" value="No"></td></tr><tr><td>Are interlocks functional?</td><td><input type="radio" name="laser_interlock" value="N/A"></td><td><input type="radio" name="laser_interlock" value="Yes"></td><td><input type="radio" name="laser_interlock" value="No"></td></tr></table></div></div>
+</div>
+<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="laser_comments" placeholder="Enter comments..."></textarea></div>
+<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_laser').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_laser" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_laser')"><div class="photo-preview-container" id="preview_laser"></div></div>
+</div>
+
+<!-- SECTION 8: Radiation Safety -->
+<div class="section" id="section-8">
+<h2 class="section-title">Radiation Safety</h2>
+<div class="card triage-card"><label class="q required">Are radiation sources present?</label><div class="radio-group"><label><input type="radio" name="triage_rad" value="Yes" onchange="toggleExpand('rad_details',true)"><span>Yes</span></label><label><input type="radio" name="triage_rad" value="N/A" onchange="toggleExpand('rad_details',false)"><span>N/A</span></label></div></div>
+<div class="expandable" id="rad_details">
+<div class="card"><label class="q">Radiation Safety</label><div style="overflow-x:auto;"><table class="matrix-table"><tr><th></th><th>N/A</th><th>Yes</th><th>No</th></tr><tr><td>Are radiation warning signs posted?</td><td><input type="radio" name="rad_signs" value="N/A"></td><td><input type="radio" name="rad_signs" value="Yes"></td><td><input type="radio" name="rad_signs" value="No"></td></tr><tr><td>Are dosimeters available/worn?</td><td><input type="radio" name="rad_dosimeter" value="N/A"></td><td><input type="radio" name="rad_dosimeter" value="Yes"></td><td><input type="radio" name="rad_dosimeter" value="No"></td></tr><tr><td>Is shielding adequate?</td><td><input type="radio" name="rad_shield" value="N/A"></td><td><input type="radio" name="rad_shield" value="Yes"></td><td><input type="radio" name="rad_shield" value="No"></td></tr><tr><td>Are survey instruments available and calibrated?</td><td><input type="radio" name="rad_survey" value="N/A"></td><td><input type="radio" name="rad_survey" value="Yes"></td><td><input type="radio" name="rad_survey" value="No"></td></tr></table></div></div>
+</div>
+<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="rad_comments" placeholder="Enter comments..."></textarea></div>
+<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_rad').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_rad" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_rad')"><div class="photo-preview-container" id="preview_rad"></div></div>
+</div>
+
+<!-- SECTION 9: PPE -->
+<div class="section" id="section-9">
+<h2 class="section-title">Personal Protective Equipment</h2>
+<div class="card"><label class="q">Are workers wearing appropriate PPE?</label><div class="radio-group"><label><input type="radio" name="ppe_wearing" value="Yes"><span>Yes</span></label><label><input type="radio" name="ppe_wearing" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Is PPE in good condition?</label><div class="radio-group"><label><input type="radio" name="ppe_condition" value="Yes"><span>Yes</span></label><label><input type="radio" name="ppe_condition" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Is PPE readily available for visitors/guests?</label><div class="radio-group"><label><input type="radio" name="ppe_visitors" value="Yes"><span>Yes</span></label><label><input type="radio" name="ppe_visitors" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Are safety glasses/goggles available?</label><div class="radio-group"><label><input type="radio" name="ppe_glasses" value="N/A"><span>N/A</span></label><label><input type="radio" name="ppe_glasses" value="Yes"><span>Yes</span></label><label><input type="radio" name="ppe_glasses" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Are hearing protectors available?</label><div class="radio-group"><label><input type="radio" name="ppe_hearing" value="N/A"><span>N/A</span></label><label><input type="radio" name="ppe_hearing" value="Yes"><span>Yes</span></label><label><input type="radio" name="ppe_hearing" value="No"><span>No</span></label></div></div>
+<div class="card"><label class="q">Comments and/or recommendations</label><textarea id="ppe_comments" placeholder="Enter comments..."></textarea></div>
+<div class="card"><label class="q">Upload Pictures</label><div class="photo-upload-area" onclick="document.getElementById('photos_ppe').click()"><div class="icon">📷</div><p>Tap to take or upload photos</p></div><input type="file" id="photos_ppe" accept="image/*" capture="environment" multiple class="hidden" onchange="handlePhotos(this,'preview_ppe')"><div class="photo-preview-container" id="preview_ppe"></div></div>
+</div>
+
+<!-- SECTION 10: Review & Submit -->
+<div class="section" id="section-10">
+<h2 class="section-title">Review &amp; Submit</h2>
+<div class="card">
+<label class="q">Overall Assessment</label>
+<div class="radio-group" style="flex-direction:column;">
+<label><input type="radio" name="overall" value="Satisfactory - No issues found"><span>✅ Satisfactory - No issues found</span></label>
+<label><input type="radio" name="overall" value="Minor Issues - Corrections needed"><span>⚠️ Minor Issues - Corrections needed</span></label>
+<label><input type="radio" name="overall" value="Major Issues - Immediate action required"><span>🚨 Major Issues - Immediate action required</span></label>
+</div>
+</div>
+<div class="card"><label class="q">Additional Notes</label><textarea id="final_notes" placeholder="Any additional observations or recommendations..." style="min-height:120px;"></textarea></div>
+<div class="card" style="background:#f0fdf4;border-color:#86efac;">
+<p style="font-size:.9em;color:#166534;"><strong>Ready to submit?</strong> Please review all sections before submitting. Once submitted, data will be sent to the QUEST Google Sheet.</p>
+</div>
+</div>
+
+<!-- BUTTON ROW -->
+<div class="btn-row">
+<button class="btn btn-prev" id="btnPrev" onclick="navigate(-1)">← Back</button>
+<button class="btn btn-next" id="btnNext" onclick="navigate(1)">Next →</button>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay"><div class="spinner"></div></div>
+
+<!-- SUCCESS MODAL -->
+<div id="modalOverlay">
+<div class="modal">
+<div class="checkmark">✅</div>
+<h2>Submitted!</h2>
+<p>Your QUEST inspection has been recorded successfully.</p>
+<button onclick="location.reload()">New Inspection</button>
+</div>
+</div><script>
+const TOTAL=11;
+const SHEET_URL="https://script.google.com/a/macros/lbl.gov/s/AKfycbxEvZvHXKyGpLSC4vq1cYnDpXLF_2ImxhMu_a5SdE4oQx3Qw_iw-p0wQv0-DUPHIbnP9A/exec";
+const DRIVE_FOLDER="11OZE6xSbCw4UpyRIg6bCNXRE9r79tCPG";
+let cur=0;
+let visited=new Set([0]);
+let photoStore={};
+
+function init(){
+let nd=document.getElementById('navDots');
+for(let i=0;i<TOTAL;i++){
+let d=document.createElement('div');
+d.className='nav-dot'+(i===0?' active':'');
+d.textContent=i+1;
+d.onclick=()=>goTo(i);
+nd.appendChild(d);
+}
+updateButtons();
+document.getElementById('quest_date').valueAsDate=new Date();
+}
+
+function goTo(n){
+if(n<0||n>=TOTAL)return;
+document.getElementById('section-'+cur).classList.remove('active');
+document.getElementById('section-'+n).classList.add('active');
+cur=n;
+visited.add(n);
+updateDots();
+updateButtons();
+updateProgress();
+window.scrollTo(0,0);
+}
+
+function navigate(dir){
+if(dir===1&&cur===TOTAL-1){submitForm();return;}
+goTo(cur+dir);
+}
+
+function updateDots(){
+let dots=document.querySelectorAll('.nav-dot');
+dots.forEach((d,i)=>{
+d.classList.remove('active','visited');
+if(i===cur)d.classList.add('active');
+else if(visited.has(i))d.classList.add('visited');
+});
+}
+
+function updateButtons(){
+let bp=document.getElementById('btnPrev');
+let bn=document.getElementById('btnNext');
+bp.style.display=cur===0?'none':'block';
+if(cur===TOTAL-1){
+bn.textContent='Submit ✓';
+bn.className='btn btn-submit';
+}else{
+bn.textContent='Next →';
+bn.className='btn btn-next';
+}
+}
+
+function updateProgress(){
+let pct=((cur+1)/TOTAL)*100;
+document.getElementById('progressFill').style.width=pct+'%';
+}
+
+function toggleExpand(id,show){
+let el=document.getElementById(id);
+if(show)el.classList.add('open');
+else el.classList.remove('open');
+}
+
+function handlePhotos(input,previewId){
+let container=document.getElementById(previewId);
+if(!photoStore[previewId])photoStore[previewId]=[];
+Array.from(input.files).forEach(file=>{
+let reader=new FileReader();
+reader.onload=function(e){
+photoStore[previewId].push({name:file.name,data:e.target.result});
+let wrapper=document.createElement('div');
+wrapper.className='photo-thumb-wrapper';
+let img=document.createElement('img');
+img.className='photo-thumb';
+img.src=e.target.result;
+let btn=document.createElement('button');
+btn.className='photo-remove';
+btn.textContent='✕';
+btn.onclick=function(){
+let idx=Array.from(container.children).indexOf(wrapper);
+photoStore[previewId].splice(idx,1);
+wrapper.remove();
+};
+wrapper.appendChild(img);
+wrapper.appendChild(btn);
+container.appendChild(wrapper);
+};
+reader.readAsDataURL(file);
+});
+input.value='';
+}
+
+function getRadio(name){
+let el=document.querySelector('input[name="'+name+'"]:checked');
+return el?el.value:'';
+}
+
+function getVal(id){
+let el=document.getElementById(id);
+return el?el.value:'';
+}
+
+function collectAllPhotos(){
+let all=[];
+Object.keys(photoStore).forEach(key=>{
+photoStore[key].forEach(p=>{
+all.push({section:key.replace('preview_',''),name:p.name,data:p.data});
+});
+});
+return all;
+}
+
+function submitForm(){
+let date=getVal('quest_date');
+let name=getVal('inspector_name');
+let room=getVal('room_number');
+if(!date||!name||!room){
+alert('Please fill in Date, Inspector Name, and Room Number.');
+goTo(0);
+return;
+}
+
+document.getElementById('loadingOverlay').classList.add('active');
+
+let photos=collectAllPhotos();
+
+let data={
+timestamp:new Date().toISOString(),
+quest_date:date,
+inspector_name:name,
+room_number:room,
+immediate_hazards:getRadio('immediate_hazards'),
+immediate_hazards_desc:getVal('immediate_hazards_desc'),
+trip_fall:getRadio('trip_fall'),
+trip_fall_desc:getVal('trip_fall_desc'),
+loud_noise:getRadio('loud_noise'),
+sharp_tools:getRadio('sharp_tools'),
+outdated_signs:getRadio('outdated_signs'),
+water_leak_equip:getRadio('water_leak_equip'),
+gas_cylinders:getRadio('gas_cylinders'),
+mg_guards:getRadio('mg_guards'),
+mg_work:getRadio('mg_work'),
+mg_bypass:getRadio('mg_bypass'),
+cryo_cond:getRadio('cryo_cond'),
+cryo_nozzle:getRadio('cryo_nozzle'),
+cryo_leaks:getRadio('cryo_leaks'),
+cryo_ppe:getRadio('cryo_ppe'),
+cryo_sign:getRadio('cryo_sign'),
+vent_unclut:getRadio('vent_unclut'),
+vent_sticker:getRadio('vent_sticker'),
+gen_safety_comments:getVal('gen_safety_comments'),
+ergo_support:getRadio('ergo_support'),
+ergo_support_desc:getVal('ergo_support_desc'),
+ergo_posture:getRadio('ergo_posture'),
+ergo_adjust:getRadio('ergo_adjust'),
+ergo_lighting:getRadio('ergo_lighting'),
+ergo_comments:getVal('ergo_comments'),
+emergency_exit:getRadio('emergency_exit'),
+earthquake_risk:getRadio('earthquake_risk'),
+fire_ext:getRadio('fire_ext'),
+emergency_comments:getVal('emergency_comments'),
+elec_panels:getRadio('elec_panels'),
+elec_breakers:getRadio('elec_breakers'),
+elec_outlets:getRadio('elec_outlets'),
+elec_gfci:getRadio('elec_gfci'),
+elec_heat:getRadio('elec_heat'),
+ext_temp:getRadio('ext_temp'),
+ext_cond:getRadio('ext_cond'),
+ext_breaker:getRadio('ext_breaker'),
+ext_daisy:getRadio('ext_daisy'),
+elec_comments:getVal('elec_comments'),
+triage_solder:getRadio('triage_solder'),
+solder_wpc:getRadio('solder_wpc'),
+solder_vent:getRadio('solder_vent'),
+solder_permit:getRadio('solder_permit'),
+solder_comments:getVal('solder_comments'),
+triage_chem:getRadio('triage_chem'),
+chem_label:getRadio('chem_label'),
+chem_sds:getRadio('chem_sds'),
+chem_storage:getRadio('chem_storage'),
+chem_inventory:getRadio('chem_inventory'),
+chem_expired:getRadio('chem_expired'),
+chem_ppe:getRadio('chem_ppe'),
+chem_spill:getRadio('chem_spill'),
+chem_waste:getRadio('chem_waste'),
+chem_comments:getVal('chem_comments'),
+triage_laser:getRadio('triage_laser'),
+laser_signs:getRadio('laser_signs'),
+laser_goggles:getRadio('laser_goggles'),
+laser_beam:getRadio('laser_beam'),
+laser_sop:getRadio('laser_sop'),
+laser_interlock:getRadio('laser_interlock'),
+laser_comments:getVal('laser_comments'),
+triage_rad:getRadio('triage_rad'),
+rad_signs:getRadio('rad_signs'),
+rad_dosimeter:getRadio('rad_dosimeter'),
+rad_shield:getRadio('rad_shield'),
+rad_survey:getRadio('rad_survey'),
+rad_comments:getVal('rad_comments'),
+ppe_wearing:getRadio('ppe_wearing'),
+ppe_condition:getRadio('ppe_condition'),
+ppe_visitors:getRadio('ppe_visitors'),
+ppe_glasses:getRadio('ppe_glasses'),
+ppe_hearing:getRadio('ppe_hearing'),
+ppe_comments:getVal('ppe_comments'),
+overall:getRadio('overall'),
+final_notes:getVal('final_notes'),
+photo_count:photos.length
+};
+
+let payload={
+action:'submit',
+folderId:DRIVE_FOLDER,
+data:data,
+photos:photos
+};
+
+fetch(SHEET_URL,{
+method:'POST',
+mode:'no-cors',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify(payload)
+}).then(()=>{
+document.getElementById('loadingOverlay').classList.remove('active');
+document.getElementById('modalOverlay').classList.add('active');
+}).catch(err=>{
+document.getElementById('loadingOverlay').classList.remove('active');
+alert('Submission error: '+err.message+'. Please try again.');
+});
+}
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
