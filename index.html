@@ -724,28 +724,14 @@ function submitForm() {
     photos: photos
   };
 
- var form = document.createElement('form');
-  form.method = 'POST';
-  form.action = SHEET_URL;
-  form.target = 'hidden_iframe';
-  var input = document.createElement('input');
-  input.type = 'hidden';
-  input.name = 'payload';
-  input.value = JSON.stringify(payload);
-  form.appendChild(input);
-  document.body.appendChild(form);
+var img = new Image();
+  var params = encodeURIComponent(JSON.stringify(payload));
+  img.src = SHEET_URL + '?data=' + params;
   
-  var iframe = document.createElement('iframe');
-  iframe.name = 'hidden_iframe';
-  iframe.style.display = 'none';
-  document.body.appendChild(iframe);
-  
-  iframe.onload = function() {
+  setTimeout(function() {
     document.getElementById('loadingOverlay').classList.remove('active');
     document.getElementById('modalOverlay').classList.add('active');
-  };
-  
-  form.submit();
+  }, 2000);
 }
 
 document.addEventListener('DOMContentLoaded', init);
