@@ -724,18 +724,28 @@ function submitForm() {
     photos: photos
   };
 
-  fetch(SHEET_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    mode: 'no-cors'
-  }).then(() => {
+ var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = SHEET_URL;
+  form.target = 'hidden_iframe';
+  var input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'payload';
+  input.value = JSON.stringify(payload);
+  form.appendChild(input);
+  document.body.appendChild(form);
+  
+  var iframe = document.createElement('iframe');
+  iframe.name = 'hidden_iframe';
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+  
+  iframe.onload = function() {
     document.getElementById('loadingOverlay').classList.remove('active');
     document.getElementById('modalOverlay').classList.add('active');
-  }).catch(err => {
-    document.getElementById('loadingOverlay').classList.remove('active');
-    alert('Submission error: ' + err.message + '. Please try again.');
-  });
+  };
+  
+  form.submit();
 }
 
 document.addEventListener('DOMContentLoaded', init);
