@@ -715,16 +715,13 @@ function submitForm() {
   document.getElementById('loadingOverlay').classList.add('active');
 
   let data = collectData();
-  let photos = collectAllPhotos();
 
   let payload = {
     action: 'submit',
-    folderId: DRIVE_FOLDER,
-    data: data,
-    photos: photos
+    data: data
   };
 
-var img = new Image();
+  var img = new Image();
   var params = encodeURIComponent(JSON.stringify(payload));
   img.src = SHEET_URL + '?data=' + params;
   
