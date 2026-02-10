@@ -727,7 +727,7 @@ function submitForm() {
   var img = new Image();
   img.src = SHEET_URL + '?data=' + params;
 
-  // Send photos via POST if any exist
+  // Send photos via hidden iframe form POST
   if (photos && photos.length > 0) {
     var photoPayload = {
       action: 'uploadPhotos',
@@ -737,18 +737,30 @@ function submitForm() {
       photos: photos
     };
 
-    fetch(SHEET_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(photoPayload)
-    });
+    var iframe = document.createElement('iframe');
+    iframe.name = 'photoFrame';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = SHEET_URL;
+    form.target = 'photoFrame';
+
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'payload';
+    input.value = JSON.stringify(photoPayload);
+    form.appendChild(input);
+
+    document.body.appendChild(form);
+    form.submit();
   }
 
   setTimeout(function() {
     document.getElementById('loadingOverlay').classList.remove('active');
     document.getElementById('modalOverlay').classList.add('active');
-  }, 2000);
+  }, 3000);
 }
 
 document.addEventListener('DOMContentLoaded', init);
