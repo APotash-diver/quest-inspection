@@ -715,16 +715,36 @@ function submitForm() {
   document.getElementById('loadingOverlay').classList.add('active');
 
   let data = collectData();
+  let photos = collectAllPhotos();
 
+  // Send form data via GET
   let payload = {
     action: 'submit',
     data: data
   };
 
-  var img = new Image();
   var params = encodeURIComponent(JSON.stringify(payload));
+  var img = new Image();
   img.src = SHEET_URL + '?data=' + params;
-  
+
+  // Send photos via POST if any exist
+  if (photos && photos.length > 0) {
+    var photoPayload = {
+      action: 'uploadPhotos',
+      folderId: DRIVE_FOLDER,
+      inspectorName: data.inspector_name || "Unknown",
+      date: data.quest_date || new Date().toISOString().split('T')[0],
+      photos: photos
+    };
+
+    fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(photoPayload)
+    });
+  }
+
   setTimeout(function() {
     document.getElementById('loadingOverlay').classList.remove('active');
     document.getElementById('modalOverlay').classList.add('active');
