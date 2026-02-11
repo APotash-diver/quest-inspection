@@ -75,7 +75,8 @@ select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
 </style>
 </head>
 <body>
-<div class="header">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>  <div class="header">
 <h1>🔬 BELLA Lab QUEST Inspection</h1>
 <p>Quarterly Safety &amp; Environment Walk-through</p>
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -99,8 +100,16 @@ select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
 // CONFIGURATION - EDIT THIS SECTION TO ADD/REMOVE/MODIFY
 // ============================================================
 
-const SHEET_URL = "https://script.google.com/a/macros/lbl.gov/s/AKfycbwMcghHzgWCP8pZACtxotqQbc4fJdfnT1LEtrNq4ZZzwtbf1rgWX5uhEdJRnMajmkaGkg/exec";
-const DRIVE_FOLDER = "11OZE6xSbCw4UpyRIg6bCNXRE9r79tCPG";
+const firebaseConfig = {
+  apiKey: "AIzaSyAz3jM1yvZEZyGmN_-ribjLqKyVIYApx54",
+  authDomain: "quest-lab-inspections.firebaseapp.com",
+  projectId: "quest-lab-inspections",
+  storageBucket: "quest-lab-inspections.firebasestorage.app",
+  messagingSenderId: "650140300107",
+  appId: "1:650140300107:web:a4cd7111cc3d629fdb2ece"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 // ---- ROOM LIST ----
 // To add a room: add a new line like { value: "71-XXXX", label: "71-XXXX (Description)" }
@@ -717,11 +726,37 @@ function submitForm() {
   let data = collectData();
   let photos = collectAllPhotos();
 
-  // Send form data via GET
-  let payload = {
-    action: 'submit',
-    data: data
+  // Add photos as base64 strings grouped by section
+  let photoData = {};
+  if (photos && photos.length > 0) {
+    photos.forEach(function(photo, index) {
+      var section = photo.section || "general";
+      if (!photoData[section]) photoData[section] = [];
+      photoData[section].push({
+        name: photo.name || ("photo_" + index + ".jpg"),
+        data: photo.data
+      });
+    });
+  }
+
+  // Combine form data and photos
+  var record = {
+    formData: data,
+    photos: photoData,
+    submittedAt: new Date().toISOString()
   };
+
+  db.collection("inspections").add(record)
+    .then(function() {
+      document.getElementById('loadingOverlay').classList.remove('active');
+      document.getElementById('modalOverlay').classList.add('active');
+    })
+    .catch(function(error) {
+      console.error("Error saving: ", error);
+      document.getElementById('loadingOverlay').classList.remove('active');
+      alert("Error submitting form. Please try again.");
+    });
+}
 
   var params = encodeURIComponent(JSON.stringify(payload));
   var img = new Image();
