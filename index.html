@@ -75,8 +75,6 @@ select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
 </style>
 </head>
 <body>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>  <div class="header">
 <h1>🔬 BELLA Lab QUEST Inspection</h1>
 <p>Quarterly Safety &amp; Environment Walk-through</p>
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -100,17 +98,6 @@ select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
 // ============================================================
 // CONFIGURATION - EDIT THIS SECTION TO ADD/REMOVE/MODIFY
 // ============================================================
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAz3jM1yvZEZyGmN_-ribjLqKyVIYApx54",
-  authDomain: "quest-lab-inspections.firebaseapp.com",
-  projectId: "quest-lab-inspections",
-  storageBucket: "quest-lab-inspections.firebasestorage.app",
-  messagingSenderId: "650140300107",
-  appId: "1:650140300107:web:a4cd7111cc3d629fdb2ece"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 
 // ---- ROOM LIST ----
 // To add a room: add a new line like { value: "71-XXXX", label: "71-XXXX (Description)" }
