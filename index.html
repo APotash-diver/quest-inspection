@@ -75,8 +75,55 @@ select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2
 </style>
 </head>
 <body>
-<h1>🔬 BELLA Lab QUEST Inspection</h1>
-<p>Quarterly Safety &amp; Environment Walk-through</p>
+<div class="header">
+<div style="margin-bottom:8px">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120" style="width:200px;height:80px">
+<defs>
+<linearGradient id="laserGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" style="stop-color:#ff0000;stop-opacity:1"/>
+<stop offset="50%" style="stop-color:#ff4444;stop-opacity:0.8"/>
+<stop offset="100%" style="stop-color:#ff0000;stop-opacity:0"/>
+</linearGradient>
+<linearGradient id="laserGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" style="stop-color:#ff6666;stop-opacity:0.5"/>
+<stop offset="100%" style="stop-color:#ff0000;stop-opacity:0"/>
+</linearGradient>
+<linearGradient id="sharkBody" x1="0%" y1="0%" x2="0%" y2="100%">
+<stop offset="0%" style="stop-color:#4a6fa5"/>
+<stop offset="50%" style="stop-color:#2d5a8e"/>
+<stop offset="100%" style="stop-color:#8ab4d6"/>
+</linearGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="2" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="laserFilter"><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<line x1="145" y1="52" x2="300" y2="30" stroke="url(#laserGrad)" stroke-width="3" filter="url(#laserFilter)"><animate attributeName="opacity" values="0.8;1;0.8" dur="0.3s" repeatCount="indefinite"/></line>
+<line x1="145" y1="52" x2="300" y2="35" stroke="url(#laserGlow)" stroke-width="6" opacity="0.4"><animate attributeName="opacity" values="0.3;0.5;0.3" dur="0.3s" repeatCount="indefinite"/></line>
+<line x1="145" y1="56" x2="300" y2="55" stroke="url(#laserGrad)" stroke-width="2.5" filter="url(#laserFilter)"><animate attributeName="opacity" values="0.7;1;0.7" dur="0.4s" repeatCount="indefinite"/></line>
+<line x1="145" y1="56" x2="300" y2="55" stroke="url(#laserGlow)" stroke-width="5" opacity="0.3"><animate attributeName="opacity" values="0.2;0.4;0.2" dur="0.4s" repeatCount="indefinite"/></line>
+<rect x="130" y="38" width="18" height="10" rx="2" fill="#555" stroke="#333" stroke-width="1"/>
+<rect x="144" y="40" width="8" height="6" rx="1" fill="#ff0000" opacity="0.9"><animate attributeName="opacity" values="0.7;1;0.7" dur="0.3s" repeatCount="indefinite"/></rect>
+<circle cx="148" cy="43" r="2" fill="#ff4444" filter="url(#glow)"><animate attributeName="r" values="1.5;2.5;1.5" dur="0.5s" repeatCount="indefinite"/></circle>
+<path d="M 30,60 Q 50,35 90,40 Q 120,38 140,45 Q 155,48 160,55 Q 165,62 160,68 Q 155,75 140,78 Q 120,82 90,80 Q 50,85 30,60 Z" fill="url(#sharkBody)" stroke="#1a4670" stroke-width="1.5"/>
+<path d="M 45,65 Q 60,78 90,78 Q 120,80 145,73 Q 155,68 155,65 Q 140,75 90,73 Q 60,72 45,65 Z" fill="#b8d8e8" opacity="0.7"/>
+<path d="M 85,40 L 75,15 L 100,38" fill="#2d5a8e" stroke="#1a4670" stroke-width="1"/>
+<path d="M 30,60 L 8,40 L 20,58 M 30,60 L 8,80 L 20,62" fill="#2d5a8e" stroke="#1a4670" stroke-width="1"/>
+<path d="M 100,72 L 85,92 L 110,78" fill="#3a6d9e" stroke="#1a4670" stroke-width="1"/>
+<circle cx="135" cy="52" r="6" fill="white" stroke="#1a4670" stroke-width="1"/>
+<circle cx="137" cy="51" r="3.5" fill="#111"/>
+<circle cx="138" cy="50" r="1.2" fill="white"/>
+<line x1="128" y1="47" x2="140" y2="44" stroke="#1a4670" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 145,62 Q 155,65 160,63" stroke="#1a4670" stroke-width="1.5" fill="none"/>
+<path d="M 147,62 L 148,66 L 150,62 L 152,66 L 154,62 L 156,66 L 158,63" fill="white" stroke="#ccc" stroke-width="0.5"/>
+<line x1="118" y1="55" x2="118" y2="65" stroke="#1a4670" stroke-width="1" opacity="0.5"/>
+<line x1="114" y1="56" x2="114" y2="66" stroke="#1a4670" stroke-width="1" opacity="0.5"/>
+<line x1="110" y1="57" x2="110" y2="67" stroke="#1a4670" stroke-width="1" opacity="0.5"/>
+<circle cx="25" cy="45" r="2" fill="none" stroke="#8ab4d6" stroke-width="0.8" opacity="0.6"><animate attributeName="cy" values="45;35;25" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.6;0.3;0" dur="2s" repeatCount="indefinite"/></circle>
+<circle cx="18" cy="55" r="1.5" fill="none" stroke="#8ab4d6" stroke-width="0.8" opacity="0.5"><animate attributeName="cy" values="55;45;35" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.5;0.2;0" dur="2.5s" repeatCount="indefinite"/></circle>
+<circle cx="22" cy="70" r="1.8" fill="none" stroke="#8ab4d6" stroke-width="0.8" opacity="0.5"><animate attributeName="cy" values="70;58;48" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.5;0.2;0" dur="3s" repeatCount="indefinite"/></circle>
+</svg>
+</div>
+<h1>BELLA Lab QUEST Inspection</h1>
+<p>Safety &amp; Environment Walk-through</p>
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 </div>
 <div class="nav-dots" id="navDots"></div>
