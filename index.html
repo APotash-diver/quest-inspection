@@ -724,36 +724,71 @@ function submitForm() {
 
   document.getElementById('loadingOverlay').classList.add('active');
 
-  let data = collectData();
-  let photos = collectAllPhotos();
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMcghHzgWCP8pZACtxotqQbc4fJdfnT1LEtrNq4ZZzwtbf1rgWX5uhEdJRnMajmkaGkg/exec';
+  var FOLDER_ID = '11OZE6xSbCw4UpyRIg6bCNXRE9r79tCPG';
 
-  let photoData = {};
-  if (photos && photos.length > 0) {
-    photos.forEach(function(photo, index) {
-      var section = photo.section || "general";
-      if (!photoData[section]) photoData[section] = [];
-      photoData[section].push({
-        name: photo.name || ("photo_" + index + ".jpg"),
-        data: photo.data
-      });
-    });
-  }
+  var data = collectData();
+  var photos = collectAllPhotos();
 
-  var record = {
-    formData: data,
-    photos: photoData,
-    submittedAt: new Date().toISOString()
-  };
+  // Step 1: Send form data to Google Sheet
+  var sheetURL = SCRIPT_URL + '?data=' + encodeURIComponent(JSON.stringify({ data: data }));
 
-  db.collection("inspections").add(record)
+  fetch(sheetURL, { mode: 'no-cors' })
     .then(function() {
-      document.getElementById('loadingOverlay').classList.remove('active');
-      document.getElementById('modalOverlay').classList.add('active');
+
+      // Step 2: Upload photos to Google Drive
+      if (photos.length === 0) {
+        document.getElementById('loadingOverlay').classList.remove('active');
+        document.getElementById('modalOverlay').classList.add('active');
+        return;
+      }
+
+      // Send photos one at a time to avoid payload size limits
+      var photoIndex = 0;
+
+      function uploadNext() {
+        if (photoIndex >= photos.length) {
+          document.getElementById('loadingOverlay').classList.remove('active');
+          document.getElementById('modalOverlay').classList.add('active');
+          return;
+        }
+
+        var photo = photos[photoIndex];
+        var payload = {
+          action: 'uploadPhotos',
+          folderId: FOLDER_ID,
+          inspectorName: data.inspector_name || 'Unknown',
+          date: data.quest_date || new Date().toISOString().split('T')[0],
+          photos: [{
+            section: photo.section,
+            name: photo.name,
+            data: photo.data
+          }]
+        };
+
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ payload: JSON.stringify(payload) })
+        })
+        .then(function() {
+          photoIndex++;
+          uploadNext();
+        })
+        .catch(function(error) {
+          console.error('Photo upload error:', error);
+          photoIndex++;
+          uploadNext();
+        });
+      }
+
+      uploadNext();
     })
     .catch(function(error) {
-      console.error("Error saving: ", error);
+      console.error('Error saving:', error);
       document.getElementById('loadingOverlay').classList.remove('active');
-      alert("Error submitting form. Please try again.");
+      alert('Error submitting form. Please try again.');
     });
 }
 
