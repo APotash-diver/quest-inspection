@@ -726,7 +726,6 @@ function submitForm() {
   let data = collectData();
   let photos = collectAllPhotos();
 
-  // Add photos as base64 strings grouped by section
   let photoData = {};
   if (photos && photos.length > 0) {
     photos.forEach(function(photo, index) {
@@ -738,6 +737,24 @@ function submitForm() {
       });
     });
   }
+
+  var record = {
+    formData: data,
+    photos: photoData,
+    submittedAt: new Date().toISOString()
+  };
+
+  db.collection("inspections").add(record)
+    .then(function() {
+      document.getElementById('loadingOverlay').classList.remove('active');
+      document.getElementById('modalOverlay').classList.add('active');
+    })
+    .catch(function(error) {
+      console.error("Error saving: ", error);
+      document.getElementById('loadingOverlay').classList.remove('active');
+      alert("Error submitting form. Please try again.");
+    });
+}
 
   // Combine form data and photos
   var record = {
@@ -757,20 +774,6 @@ function submitForm() {
       alert("Error submitting form. Please try again.");
     });
 }
-
-  var params = encodeURIComponent(JSON.stringify(payload));
-  var img = new Image();
-  img.src = SHEET_URL + '?data=' + params;
-
-  // Send photos via hidden iframe form POST
-  if (photos && photos.length > 0) {
-    var photoPayload = {
-      action: 'uploadPhotos',
-      folderId: DRIVE_FOLDER,
-      inspectorName: data.inspector_name || "Unknown",
-      date: data.quest_date || new Date().toISOString().split('T')[0],
-      photos: photos
-    };
 
 document.addEventListener('DOMContentLoaded', init);
 </script>
