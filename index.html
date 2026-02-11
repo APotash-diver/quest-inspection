@@ -756,25 +756,6 @@ function submitForm() {
     });
 }
 
-  // Combine form data and photos
-  var record = {
-    formData: data,
-    photos: photoData,
-    submittedAt: new Date().toISOString()
-  };
-
-  db.collection("inspections").add(record)
-    .then(function() {
-      document.getElementById('loadingOverlay').classList.remove('active');
-      document.getElementById('modalOverlay').classList.add('active');
-    })
-    .catch(function(error) {
-      console.error("Error saving: ", error);
-      document.getElementById('loadingOverlay').classList.remove('active');
-      alert("Error submitting form. Please try again.");
-    });
-}
-
 document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
