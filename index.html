@@ -743,7 +743,6 @@ function submitForm() {
         return;
       }
 
-      // Send photos one at a time to avoid payload size limits
       var photoIndex = 0;
 
       function uploadNext() {
@@ -765,6 +764,34 @@ function submitForm() {
             data: photo.data
           }]
         };
+
+        var formData = new FormData();
+        formData.append('payload', JSON.stringify(payload));
+
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: formData
+        })
+        .then(function() {
+          photoIndex++;
+          uploadNext();
+        })
+        .catch(function(error) {
+          console.error('Photo upload error:', error);
+          photoIndex++;
+          uploadNext();
+        });
+      }
+
+      uploadNext();
+    })
+    .catch(function(error) {
+      console.error('Error saving:', error);
+      document.getElementById('loadingOverlay').classList.remove('active');
+      alert('Error submitting form. Please try again.');
+    });
+}
 
         fetch(SCRIPT_URL, {
           method: 'POST',
